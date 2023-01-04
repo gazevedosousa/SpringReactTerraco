@@ -1,18 +1,15 @@
 package com.terraco.terracoDaCida.model.entity;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name="comanda")
 @Data
-@RequiredArgsConstructor
-@Builder
 public class Comanda {
     @Id
     @Column(name = "co_comanda")
@@ -20,28 +17,31 @@ public class Comanda {
     private Long coComanda;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "co_cliente", referencedColumnName = "co_cliente")
+    @JoinColumn(name = "co_cliente", referencedColumnName = "co_cliente", nullable = false)
     private Cliente cliente;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "co_situacao_comanda", referencedColumnName = "co_situacao_comanda")
+    @JoinColumn(name = "co_situacao_comanda", referencedColumnName = "co_situacao_comanda", nullable = false)
     private SituacaoComanda situacaoComanda;
 
-    @Column(name = "dh_criacao")
-    @Nullable
+    @Column(name = "dh_criacao", nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate dhCriacao;
 
-    @Column(name = "dh_atualizacao")
+    @Column(name = "dh_atualizacao", nullable = false)
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate dhAtualizacao;
 
-    @Column(name = "dh_exclusao")
-    @Nullable
+    @Column(name = "dh_exclusao", nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate dhExclusao;
 
-    @OneToMany(mappedBy = "comanda")
-    Set<ComandaProduto> comandaProdutos;
+    @ManyToMany
+    @JoinColumn(name="co_comanda")
+    private List<ComandaProduto> comandaProdutos;
+
+    @OneToMany
+    @JoinColumn(name="co_comanda")
+    private List<Pagamento> pagamentos;
 
 
 }

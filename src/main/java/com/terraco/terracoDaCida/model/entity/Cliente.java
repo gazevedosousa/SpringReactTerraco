@@ -1,47 +1,44 @@
 package com.terraco.terracoDaCida.model.entity;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name="cliente")
 @Data
-@RequiredArgsConstructor
-@Builder
 public class Cliente {
     @Id
     @Column(name = "co_cliente")
     @GeneratedValue( strategy = GenerationType.IDENTITY)
-    private Long coCliente;
+    private int coCliente;
 
-    @Column(name = "no_cliente")
+    @Column(name = "no_cliente", nullable = false)
     private String noCliente;
 
-    @Column(name = "cel_cliente")
+    @Column(name = "cel_cliente", nullable = false)
     private String celCliente;
 
-    @Column(name = "email_cliente")
+    @Column(name = "email_cliente", nullable = true)
     private String emailCliente;
 
-    @Column(name = "dh_criacao")
-    @Nullable
+    @Column(name = "dh_criacao", nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate dhCriacao;
 
-    @Column(name = "dh_atualizacao")
+    @Column(name = "dh_atualizacao", nullable = false)
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate dhAtualizacao;
 
-    @Column(name = "dh_exclusao")
-    @Nullable
+    @Column(name = "dh_exclusao", nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate dhExclusao;
 
-    @OneToMany(mappedBy = "cliente")
-    private Comanda comanda;
+    @OneToMany
+    @JoinColumn(name="co_cliente")
+    private List<Comanda> comandas;
 
 }
