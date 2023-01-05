@@ -1,7 +1,10 @@
 package com.terraco.terracoDaCida.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
@@ -9,6 +12,9 @@ import java.time.LocalDate;
 @Entity
 @Table(name="situacaocomanda")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SituacaoComanda {
     @Id
     @Column(name="co_situacao_comanda")

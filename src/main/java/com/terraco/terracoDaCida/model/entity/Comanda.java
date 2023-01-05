@@ -10,6 +10,9 @@ import java.util.List;
 @Entity
 @Table(name="comanda")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Comanda {
     @Id
     @Column(name = "co_comanda")

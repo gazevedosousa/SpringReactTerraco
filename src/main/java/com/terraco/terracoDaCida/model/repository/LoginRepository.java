@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface LoginRepository extends JpaRepository<Login, Long> {
-    boolean existsByNoUsuario(String usuario);
+    boolean existsByNoUsuarioAndDhExclusaoIsNull(String NoUsuario);
+    Optional<Login> findByNoUsuarioAndDhExclusaoIsNull(String NoUsuario);
 }

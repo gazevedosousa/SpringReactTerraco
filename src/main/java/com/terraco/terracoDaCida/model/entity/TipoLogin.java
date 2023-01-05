@@ -1,18 +1,24 @@
 package com.terraco.terracoDaCida.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
 @Entity
 @Table(name="tipologin")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TipoLogin {
     @Id
     @Column(name="co_tipo_login")
     @GeneratedValue( strategy = GenerationType.IDENTITY)
-    private int coTipoLogin;
+    private Long coTipoLogin;
 
     @Column(name="no_tipo_login", nullable = false)
     private String noTipoLogin;

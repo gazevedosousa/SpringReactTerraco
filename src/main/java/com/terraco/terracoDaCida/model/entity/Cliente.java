@@ -10,11 +10,14 @@ import java.util.List;
 @Entity
 @Table(name="cliente")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Cliente {
     @Id
     @Column(name = "co_cliente")
     @GeneratedValue( strategy = GenerationType.IDENTITY)
-    private int coCliente;
+    private Long coCliente;
 
     @Column(name = "no_cliente", nullable = false)
     private String noCliente;

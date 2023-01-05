@@ -1,7 +1,10 @@
 package com.terraco.terracoDaCida.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.math.BigDecimal;
@@ -11,13 +14,16 @@ import java.util.List;
 @Entity
 @Table(name="produto")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Produto {
     @Id
     @Column(name="co_produto")
     @GeneratedValue( strategy = GenerationType.IDENTITY)
     private Long coProduto;
 
-    @Column(name="no_produto", unique = true, nullable = false)
+    @Column(name="no_produto", nullable = false)
     private String noProduto;
 
     @Column(name="vr_produto", nullable = false)

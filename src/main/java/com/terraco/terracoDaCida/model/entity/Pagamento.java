@@ -10,6 +10,9 @@ import java.time.LocalDate;
 @Entity
 @Table(name="pagamento")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pagamento {
     @Id
     @Column(name="co_pagamento")

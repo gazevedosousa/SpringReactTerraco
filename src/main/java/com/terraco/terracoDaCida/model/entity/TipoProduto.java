@@ -1,13 +1,19 @@
 package com.terraco.terracoDaCida.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
 @Entity
 @Table(name="tipoproduto")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TipoProduto {
     @Id
     @Column(name="co_tipo_produto")

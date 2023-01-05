@@ -6,67 +6,110 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Optional;
 
-@SpringBootTest
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 public class LoginRepositoryTest {
 
     @Autowired
     LoginRepository repository;
-    TipoLoginRepository tipoLoginRepository;
+    @Autowired
+    TestEntityManager entityManager;
 
     @Test
-    public void deveVerificarAExistenciaDeUmUsuario(){
-        TipoLogin tipoLogin = new TipoLogin();
-
-        tipoLogin.setCoTipoLogin(1);
-        tipoLogin.setNoTipoLogin("Administrador");
-        tipoLogin.setDhCriacao(LocalDate.now());
-        tipoLogin.setDhAtualizacao(LocalDate.now());
-
-        Login login = new Login();
-
-        login.setCoLogin(1);
-        login.setNoUsuario("admin");
-        login.setCoSenha("admin");
-        login.setTipoLogin(tipoLogin);
-        login.setDhCriacao(LocalDate.now());
-        login.setDhAtualizacao(LocalDate.now());
-
-        repository.save(login);
-
-        boolean existe = repository.existsByNoUsuario("admin");
-
+    public void deveVerificarAExistenciaDeUmLoginComBaseNoNomeDoUsuario(){
+        //cenário
+        Login login = criaLogin();
+        entityManager.persist(login);
+        //ação
+        boolean existe = repository.existsByNoUsuarioAndDhExclusaoIsNull("Admin");
+        //verificação
         Assertions.assertTrue(existe);
     }
 
     @Test
-    public void deveRetornarFalsoQuandoNaoTiverUsuarioNaBase(){
-        TipoLogin tipoLogin = new TipoLogin();
+    public void deveRetornarFalsoQuandoNaoTiverLoginComNomeDeUsuarioNaBase(){
+        //cenário
 
-        tipoLogin.setCoTipoLogin(1);
-        tipoLogin.setNoTipoLogin("Administrador");
-        tipoLogin.setDhCriacao(LocalDate.now());
-        tipoLogin.setDhAtualizacao(LocalDate.now());
-
-        Login login = new Login();
-
-        login.setCoLogin(1);
-        login.setNoUsuario("admin");
-        login.setCoSenha("admin");
-        login.setTipoLogin(tipoLogin);
-        login.setDhCriacao(LocalDate.now());
-        login.setDhAtualizacao(LocalDate.now());
-
-        repository.save(login);
-
-        boolean naoExiste = repository.existsByNoUsuario("admin123");
-
+        //ação
+        boolean naoExiste = repository.existsByNoUsuarioAndDhExclusaoIsNull("admin123");
+        //verificação
         Assertions.assertFalse(naoExiste);
+    }
+
+    @Test
+    public void deveRetornarFalsoQuandoTiverLoginExcluidoNaBaseEBuscarOLoginPeloNomeDeUsuario(){
+        //cenário
+        Login login = criaLogin();
+        login.setDhExclusao(LocalDate.now());
+        entityManager.persist(login);
+        //ação
+        Optional<Login> loginDoBanco = repository.findByNoUsuarioAndDhExclusaoIsNull("Admin");
+        //verificação
+        Assertions.assertFalse(loginDoBanco.isPresent());
+    }
+
+    @Test
+    public void deveRetornarFalsoQuandoTiverLoginExcluidoNaBaseEVerificarSeExisteLoginNaBase(){
+        //cenário
+        Login login = criaLogin();
+        login.setDhExclusao(LocalDate.now());
+        entityManager.persist(login);
+        //ação
+        boolean naoExiste = repository.existsByNoUsuarioAndDhExclusaoIsNull("Admin");
+        //verificação
+        Assertions.assertFalse(naoExiste);
+    }
+
+    @Test
+    public void deveBuscarLoginComBaseNoNomeDeUsuario(){
+        //cenário
+        Login login = criaLogin();
+        entityManager.persist(login);
+        //ação
+        Optional<Login> loginDoBanco = repository.findByNoUsuarioAndDhExclusaoIsNull("Admin");
+        //verificação
+        Assertions.assertTrue(loginDoBanco.isPresent());
+    }
+
+    @Test
+    public void deveRetornarLoginVazioComBaseNoNomeDeUsuario(){
+        //cenário
+
+        //ação
+        Optional<Login> loginDoBanco = repository.findByNoUsuarioAndDhExclusaoIsNull("Admin");
+        //verificação
+        Assertions.assertFalse(loginDoBanco.isPresent());
+    }
+
+    public static TipoLogin criaTipoLogin(){
+
+        return TipoLogin.builder()
+                .noTipoLogin("Administrador")
+                .dhCriacao(LocalDate.now())
+                .dhAtualizacao(LocalDate.now())
+                .build();
+    }
+
+    public static Login criaLogin(){
+        TipoLogin tipoLogin = criaTipoLogin();
+
+        return Login.builder()
+                .noUsuario("Admin")
+                .coSenha("Admin")
+                .tipoLogin(tipoLogin)
+                .dhCriacao(LocalDate.now())
+                .dhAtualizacao(LocalDate.now())
+                .build();
     }
 }
