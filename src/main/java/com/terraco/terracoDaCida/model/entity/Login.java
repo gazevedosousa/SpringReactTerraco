@@ -1,6 +1,7 @@
 package com.terraco.terracoDaCida.model.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.terraco.terracoDaCida.model.enums.PerfilEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="login")
@@ -18,30 +20,30 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Login {
     @Id
-    @Column(name = "co_login")
+    @Column
     @GeneratedValue( strategy = GenerationType.IDENTITY)
-    private Long coLogin;
+    private Long id;
 
-    @Column(name = "no_usuario", nullable = false)
+    @Column(nullable = false)
     private String noUsuario;
 
-    @Column(name = "co_senha", nullable = false)
-    private String coSenha;
+    @Column(nullable = false)
+    private byte[] coSenha;
 
-    @Column(name = "dh_criacao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhCriacao;
+    @Column(nullable = false)
+    private PerfilEnum perfil;
 
-    @Column(name = "dh_atualizacao", nullable = false)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhAtualizacao;
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataCriacao;
 
-    @Column(name = "dh_exclusao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhExclusao;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "co_tipo_login", referencedColumnName = "co_tipo_login")
-    @JsonDeserialize
-    private TipoLogin tipoLogin;
+    @Column(nullable = false)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataAtualizacao;
+
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataExclusao;
+
 
 }

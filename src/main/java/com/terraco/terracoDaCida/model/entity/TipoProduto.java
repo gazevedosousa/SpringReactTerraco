@@ -1,13 +1,23 @@
 package com.terraco.terracoDaCida.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Table(name="tipoproduto")
 @Data
@@ -16,26 +26,25 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TipoProduto {
     @Id
-    @Column(name="co_tipo_produto")
     @GeneratedValue( strategy = GenerationType.IDENTITY)
-    private Long coTipoProduto;
+    private Long id;
 
-    @Column(name="no_tipo_produto", nullable = false)
+    @Column(nullable = false)
     private String noTipoProduto;
 
-    @Column(name = "dh_criacao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhCriacao;
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataCriacao;
 
-    @Column(name = "dh_atualizacao", nullable = false)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhAtualizacao;
+    @Column(nullable = false)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataAtualizacao;
 
-    @Column(name = "dh_exclusao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhExclusao;
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataExclusao;
 
-    @OneToOne(mappedBy = "tipoProduto")
-    private Produto produto;
+    @OneToMany(mappedBy = "tipoProduto", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Produto> produtos;
 
 }

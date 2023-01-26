@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,28 +16,28 @@ import java.util.List;
 @AllArgsConstructor
 public class ComandaProduto {
     @Id
-    @Column(name = "co_comanda_produto")
+    @Column
     @GeneratedValue( strategy = GenerationType.IDENTITY)
-    private Long coComandaProduto;
+    private Long id;
 
-    @ManyToMany
-    @JoinColumn(name = "co_comanda", nullable = false)
-    private List<Comanda> comandas;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Comanda comanda;
 
-    @ManyToMany
-    @JoinColumn(name = "co_produto", nullable = false)
-    private List<Produto> produtos;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Produto produto;
 
-    @Column(name = "dh_criacao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhCriacao;
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataCriacao;
 
-    @Column(name = "dh_atualizacao", nullable = false)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhAtualizacao;
+    @Column(nullable = false)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataAtualizacao;
 
-    @Column(name = "dh_exclusao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhExclusao;
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataExclusao;
 
 }

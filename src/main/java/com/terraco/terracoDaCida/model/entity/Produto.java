@@ -1,6 +1,16 @@
 package com.terraco.terracoDaCida.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +18,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,33 +29,32 @@ import java.util.List;
 @AllArgsConstructor
 public class Produto {
     @Id
-    @Column(name="co_produto")
+    @Column
     @GeneratedValue( strategy = GenerationType.IDENTITY)
-    private Long coProduto;
+    private Long id;
 
-    @Column(name="no_produto", nullable = false)
+    @Column(nullable = false)
     private String noProduto;
 
-    @Column(name="vr_produto", nullable = false)
+    @Column(nullable = false)
     private BigDecimal vrProduto;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "co_tipo_produto", referencedColumnName = "co_tipo_produto", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(referencedColumnName = "id", nullable = false)
     private TipoProduto tipoProduto;
 
-    @Column(name = "dh_criacao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhCriacao;
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataCriacao;
 
-    @Column(name = "dh_atualizacao", nullable = false)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhAtualizacao;
+    @Column(nullable = false)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataAtualizacao;
 
-    @Column(name = "dh_exclusao", nullable = true)
-    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dhExclusao;
+    @Column(nullable = true)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataExclusao;
 
-    @ManyToMany
-    @JoinColumn(name="co_produto")
+    @OneToMany(mappedBy = "produto")
     private List<ComandaProduto> comandaProdutos;
 
 }

@@ -1,40 +1,41 @@
 package com.terraco.terracoDaCida.service.impl;
 
-import com.terraco.terracoDaCida.exceptions.ErroAtualizacaoLogin;
-import com.terraco.terracoDaCida.exceptions.ErroAutenticacao;
-import com.terraco.terracoDaCida.exceptions.ErroExclusaoLogin;
-import com.terraco.terracoDaCida.exceptions.RegraNegocioException;
+import com.terraco.terracoDaCida.Util.CriptografiaUtil;
+import com.terraco.terracoDaCida.api.dto.LoginDTOView;
+import com.terraco.terracoDaCida.exceptions.ErroLoginService;
+import com.terraco.terracoDaCida.mapper.LoginMapper;
 import com.terraco.terracoDaCida.model.entity.Login;
 import com.terraco.terracoDaCida.model.repository.LoginRepository;
 import com.terraco.terracoDaCida.service.LoginService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class LoginServiceImpl implements LoginService {
 
-    private LoginRepository repository;
+    private final LoginRepository repository;
 
-    @Autowired
-    public LoginServiceImpl(LoginRepository repository) {
-        super();
-        this.repository = repository;
-    }
+    private final LoginMapper mapper = LoginMapper.INSTANCE;
 
     @Override
-    public Login autenticar(String noUsuario, String coSenha) {
-        Optional<Login> login = repository.findByNoUsuarioAndDhExclusaoIsNull(noUsuario);
+    public Login autenticar(String noUsuario, String coSenha) throws NoSuchAlgorithmException {
+        Optional<Login> login = repository.findByNoUsuarioAndDataExclusaoIsNull(noUsuario);
 
         if(login.isEmpty()){
-            throw new ErroAutenticacao("Usuário não encontrado na base de dados");
+            throw new ErroLoginService("Usuário não encontrado na base de dados");
         }
 
-        if(!login.get().getCoSenha().equals(coSenha)){
-            throw new ErroAutenticacao("Senha inválida");
+        if(!Arrays.equals(login.get().getCoSenha(), CriptografiaUtil.criptografar(coSenha))){
+            throw new ErroLoginService("Senha inválida");
         }
 
         return login.get();
@@ -42,43 +43,62 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     @Transactional
-    public Login criarLogin(Login login) {
+    public LoginDTOView criarLogin(Login login) {
         validarLogin(login.getNoUsuario());
-        return repository.save(login);
+        login.setDataCriacao(LocalDateTime.now());
+        login.setDataAtualizacao(LocalDateTime.now());
+        return mapper.toDto(repository.save(login));
     }
     @Override
     @Transactional
-    public Login alterarSenha(Login login, String coSenhaNova) {
-        Optional<Login> buscaLogin = repository.findByNoUsuarioAndDhExclusaoIsNull(login.getNoUsuario());
+    public LoginDTOView alterarSenha(Login login, String coSenhaNova) throws NoSuchAlgorithmException {
+        Login loginAtualizado = repository.findByNoUsuarioAndDataExclusaoIsNull(login.getNoUsuario())
+                .orElseThrow(() -> new ErroLoginService("Usuário não encontrado na base de dados"));
 
-        if(buscaLogin.isEmpty()){
-            throw new ErroAtualizacaoLogin("Usuário não encontrado na base de dados");
-        }
-
-        Login loginAtualizado = buscaLogin.get();
-        loginAtualizado.setCoSenha(coSenhaNova);
-        return repository.save(loginAtualizado);
+        loginAtualizado.setCoSenha(CriptografiaUtil.criptografar(coSenhaNova));
+        loginAtualizado.setDataAtualizacao(LocalDateTime.now());
+        return mapper.toDto(repository.save(loginAtualizado));
     }
 
     @Override
-    public Login deletarLogin(Login login) {
-        Optional<Login> buscaLogin = repository.findByNoUsuarioAndDhExclusaoIsNull(login.getNoUsuario());
+    @Transactional
+    public LoginDTOView deletarLogin(Login login) {
+        Login loginDeletado = repository.findByNoUsuarioAndDataExclusaoIsNull(login.getNoUsuario())
+                .orElseThrow(() -> new ErroLoginService("Usuário não encontrado na base de dados"));
 
-        if(buscaLogin.isEmpty()){
-            throw new ErroExclusaoLogin("Usuário não encontrado na base de dados");
-        }
+        loginDeletado.setDataExclusao(LocalDateTime.now());
+        loginDeletado.setDataAtualizacao(LocalDateTime.now());
+        return mapper.toDto(repository.save(loginDeletado));
+    }
 
-        Login loginDeletado = buscaLogin.get();
-        loginDeletado.setDhExclusao(LocalDate.now());
-        return repository.save(loginDeletado);
+    @Override
+    public Login buscarLogin(Long id) {
+        return repository.findByIdAndDataExclusaoIsNull(id)
+                .orElseThrow(() -> new ErroLoginService("Usuário não encontrado na base de dados"));
+    }
+
+    @Override
+    public List<LoginDTOView> buscarTodosOsLogins() {
+        List<Login> logins = repository.findAllWhereDataExclusaoIsNull();
+        List<LoginDTOView> loginDTOViews = new ArrayList<>();
+
+        logins.forEach(login -> {
+            loginDTOViews.add(mapper.toDto(login));
+        });
+
+        return loginDTOViews;
     }
 
     @Override
     public void validarLogin(String noUsuario) {
-        boolean existe = repository.existsByNoUsuarioAndDhExclusaoIsNull(noUsuario);
+        boolean existe = repository.existsByNoUsuarioAndDataExclusaoIsNull(noUsuario);
 
         if(existe){
-            throw new RegraNegocioException("Usuário já cadastrado!");
+            throw new ErroLoginService("Usuário já cadastrado!");
         }
+    }
+
+    public LoginDTOView buscarUsuario(String noUsuario) {
+        return mapper.toDto(repository.findByNoUsuarioAndDataExclusaoIsNull(noUsuario).orElse(null));
     }
 }

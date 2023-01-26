@@ -1,16 +1,25 @@
 package com.terraco.terracoDaCida.service;
 
+import com.terraco.terracoDaCida.api.dto.LoginDTOView;
 import com.terraco.terracoDaCida.model.entity.Login;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public interface LoginService {
 
-    Login autenticar(String NoUsuario, String coSenha);
+    Login autenticar(String NoUsuario, String coSenha) throws NoSuchAlgorithmException;
 
-    Login criarLogin(Login login);
+    LoginDTOView criarLogin(Login login);
 
-    Login alterarSenha(Login login, String coSenhaNova);
+    LoginDTOView alterarSenha(Login login, String coSenhaNova) throws NoSuchAlgorithmException;
 
-    Login deletarLogin(Login login);
+    LoginDTOView deletarLogin(Login login);
+
+    Login buscarLogin(Long id);
+
+    List<LoginDTOView> buscarTodosOsLogins();
 
     void validarLogin(String noUsuario);
+
 }
