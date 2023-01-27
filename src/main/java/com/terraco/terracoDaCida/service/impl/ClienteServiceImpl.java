@@ -37,15 +37,14 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente clienteAtualizado = repository.findByIdAndDataExclusaoIsNull(cliente.getId())
                 .orElseThrow(() -> new ErroClienteService("Cliente não encontrado no Banco de Dados"));
 
-        if(novoCelCliente != null){
+        if(!novoCelCliente.isEmpty()){
             clienteAtualizado.setCelCliente(novoCelCliente);
         }
-        if(novoEmailCliente != null){
+        if(!novoEmailCliente.isEmpty()){
             clienteAtualizado.setEmailCliente(novoEmailCliente);
         }
 
         clienteAtualizado.setDataAtualizacao(LocalDateTime.now());
-
 
         return mapper.toDto(repository.save(clienteAtualizado));
     }

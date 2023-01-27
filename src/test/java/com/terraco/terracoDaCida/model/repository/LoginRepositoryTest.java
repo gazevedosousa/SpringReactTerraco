@@ -1,9 +1,14 @@
 package com.terraco.terracoDaCida.model.repository;
 
+import com.terraco.terracoDaCida.api.dto.LoginDTO;
+import com.terraco.terracoDaCida.exceptions.ErroLoginService;
+import com.terraco.terracoDaCida.mapper.LoginMapper;
 import com.terraco.terracoDaCida.model.entity.Login;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -12,82 +17,111 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
+
 public class LoginRepositoryTest {
-/*
     @Autowired
     LoginRepository repository;
     @Autowired
     TestEntityManager entityManager;
+    @Spy
+    private LoginMapper mapper = Mappers.getMapper(LoginMapper.class);
 
     @Test
     public void deveVerificarAExistenciaDeUmLoginComBaseNoNomeDoUsuario(){
         //cenário
-
-        entityManager.persist(login);
+        entityManager.persist(criaLogin());
         //ação
-        boolean existe = repository.existsByNoUsuarioAndDataExclusaoIsNull("Admin");
+        boolean existe = repository.existsByNoUsuarioAndDataExclusaoIsNull("User");
         //verificação
         Assertions.assertTrue(existe);
     }
 
     @Test
-    public void deveRetornarFalsoQuandoNaoTiverLoginComNomeDeUsuarioNaBase(){
+    public void deveRetornarFalseQuandoNaoExisteNenhumLoginNoBanco(){
         //cenário
 
         //ação
-        boolean naoExiste = repository.existsByNoUsuarioAndDataExclusaoIsNull("admin123");
+        boolean existe = repository.existsByNoUsuarioAndDataExclusaoIsNull("User");
         //verificação
-        Assertions.assertFalse(naoExiste);
+        Assertions.assertFalse(existe);
     }
 
     @Test
-    public void deveRetornarFalsoQuandoTiverLoginExcluidoNaBaseEBuscarOLoginPeloNomeDeUsuario(){
+    public void deveAcharTodosOsLoginsQueNaoEstaoExcluidos(){
         //cenário
+        Login login1 = entityManager.persist(criaLogin());
+        Login login2 = criaLogin();
+        login2.setNoUsuario("usuario2");
+        entityManager.persist(login2);
+        Login login3 = criaLogin();
+        login3.setNoUsuario("usuario3");
+        login3.setDataExclusao(LocalDateTime.now());
+        entityManager.persist(login3);
 
-        login.setDataExclusao(LocalDateTime.now());
-        entityManager.persist(login);
+        List<Login> loginNaoExcluido = new ArrayList<>();
+        loginNaoExcluido.add(login1);
+        loginNaoExcluido.add(login2);
         //ação
-        Optional<Login> loginDoBanco = repository.findByNoUsuarioAndDataExclusaoIsNull("Admin");
+        List<Login> loginList = repository.findAllWhereDataExclusaoIsNull();
         //verificação
-        Assertions.assertFalse(loginDoBanco.isPresent());
+        Assertions.assertEquals(loginNaoExcluido, loginList);
     }
 
     @Test
-    public void deveRetornarFalsoQuandoTiverLoginExcluidoNaBaseEVerificarSeExisteLoginNaBase(){
+    public void deveRetornarUmUsuarioQuandoAchadoNoBanco(){
         //cenário
-
-        login.setDataExclusao(LocalDateTime.now());
-        entityManager.persist(login);
+        entityManager.persist(criaLogin());
         //ação
-        boolean naoExiste = repository.existsByNoUsuarioAndDataExclusaoIsNull("Admin");
+        Login loginDoBanco = repository.findByNoUsuarioAndDataExclusaoIsNull("User")
+                .orElseThrow(() -> new ErroLoginService("Usuário não Encontrado") );
         //verificação
-        Assertions.assertFalse(naoExiste);
+        Assertions.assertNotNull(loginDoBanco);
+    }
+
+    @Test(expected = ErroLoginService.class)
+    public void deveRetornarErroAoNaoAcharUsuario(){
+        //verificação
+        Login loginDoBanco = repository.findByNoUsuarioAndDataExclusaoIsNull("User")
+                .orElseThrow(() -> new ErroLoginService("Usuário não Encontrado") );
     }
 
     @Test
-    public void deveBuscarLoginComBaseNoNomeDeUsuario(){
+    public void deveRetornarUmUsuarioComBaseNoIdAchadoNoBanco(){
         //cenário
-
-        entityManager.persist(login);
+        Login loginPersistido = entityManager.persist(criaLogin());
         //ação
-        Optional<Login> loginDoBanco = repository.findByNoUsuarioAndDataExclusaoIsNull("Admin");
+        Login loginDoBanco = repository.findByIdAndDataExclusaoIsNull(loginPersistido.getId())
+                .orElseThrow(() -> new ErroLoginService("Usuário não Encontrado") );
         //verificação
-        Assertions.assertTrue(loginDoBanco.isPresent());
+        Assertions.assertNotNull(loginDoBanco);
     }
 
-    @Test
-    public void deveRetornarLoginVazioComBaseNoNomeDeUsuario(){
-        //cenário
-
-        //ação
-        Optional<Login> loginDoBanco = repository.findByNoUsuarioAndDataExclusaoIsNull("Admin");
+    @Test(expected = ErroLoginService.class)
+    public void deveRetornarErroAoNaoAcharUsuarioComBaseNoId(){
         //verificação
-        Assertions.assertFalse(loginDoBanco.isPresent());
-    }*/
+        Login loginDoBanco = repository.findByIdAndDataExclusaoIsNull(1l)
+                .orElseThrow(() -> new ErroLoginService("Usuário não Encontrado") );
+    }
+
+    private Login criaLogin(){
+        LoginDTO dto =LoginDTO.builder()
+            .noUsuario("User")
+            .perfil("USER")
+            .coSenha("senha")
+            .build();
+
+        Login loginMapeado = mapper.toEntity(dto);
+        loginMapeado.setDataCriacao(LocalDateTime.now());
+        loginMapeado.setDataAtualizacao(LocalDateTime.now());
+
+        return loginMapeado;
+    }
+
 }

@@ -13,7 +13,7 @@ import org.mapstruct.factory.Mappers;
 public interface LoginMapper {
 
     LoginMapper INSTANCE = Mappers.getMapper(LoginMapper.class);
-    //refatorar mappers
+
     @Named("dtoToEntity")
     default byte[] dtoToEntity(String valor) {
         return LoginQualifier.getFirstInstance()

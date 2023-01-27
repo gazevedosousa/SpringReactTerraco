@@ -1,82 +1,96 @@
 package com.terraco.terracoDaCida.service;
 
+import com.terraco.terracoDaCida.api.dto.LoginDTO;
+import com.terraco.terracoDaCida.api.dto.LoginDTOView;
+import com.terraco.terracoDaCida.exceptions.ErroLoginService;
+import com.terraco.terracoDaCida.mapper.LoginMapper;
+import com.terraco.terracoDaCida.model.entity.Login;
+import com.terraco.terracoDaCida.model.repository.LoginRepository;
+import com.terraco.terracoDaCida.service.impl.LoginServiceImpl;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 public class LoginServiceTest {
-    /*@Mock
+
+    @MockBean
     LoginRepository repository;
-    @InjectMocks
+    @SpyBean
     LoginServiceImpl service;
+    @Spy
+    private LoginMapper mapper = Mappers.getMapper(LoginMapper.class);
 
     @Test(expected = Test.None.class)
     public void deveValidarLoginComSucesso(){
         //cenário
         Mockito.when(repository.existsByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(false);
         //validação
-        service.validarLogin("Admin");
+        service.validarLogin("Login");
     }
-
-    @Test(expected = RegraNegocioException.class)
-    public void deveLancarErroAoValidarLogin(){
+    @Test(expected = ErroLoginService.class)
+    public void deveLancarErroAoValidar(){
         //cenário
         Mockito.when(repository.existsByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(true);
         //validação
-        service.validarLogin("Admin");
+        service.validarLogin("Login");
     }
-
     @Test(expected = Test.None.class)
-    public void deveAutenticarLoginComSucesso() throws NoSuchAlgorithmException {
+    public void deveAutenticarLogin() throws NoSuchAlgorithmException {
         //cenário
-        String noUsuario = "Admin";
-        String coSenha = "Admin";
-
         Login login = criaLogin();
-        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(noUsuario)).thenReturn(Optional.of(login));
-
-        //ação
-        Login resultado = service.autenticar(noUsuario, coSenha);
-
-        //verificação
-        Assertions.assertNotNull(resultado);
-    }
-
-    @Test
-    public void deveLancarErroAutenticacaoQuandoNaoEncontrarLogin(){
-        //cenário
-        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.empty());
-        //ação
-        ErroAutenticacao exception = Assertions.assertThrows(ErroAutenticacao.class, () -> service.autenticar("Admin", "Admin"));
-        //validação
-        Assertions.assertEquals("Usuário não encontrado na base de dados", exception.getMessage());
-    }
-
-    @Test
-    public void deveLancarErroAutenticacaoQuandoSenhaForDiferente(){
-        //cenário
-        String coSenha = "Admin";
-        TipoLogin tipoLogin = criaTipoLogin();
-
-        Login login = Login.builder()
-                      .noUsuario("Admin")
-                      .tipoLogin(tipoLogin)
-                      .coSenha(coSenha)
-                      .dataCriacao(LocalDateTime.now())
-                      .dataAtualizacao(LocalDateTime.now())
-                      .build();
-
+        String noUsuario = "User";
+        String coSenha = "senha";
         Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.of(login));
         //ação
-        ErroAutenticacao exception = Assertions.assertThrows(ErroAutenticacao.class, () -> service.autenticar("Admin", "senhaInvalida"));
-        //validação
-        Assertions.assertEquals("Senha inválida", exception.getMessage());
+        Login loginAutenticado = service.autenticar(noUsuario, coSenha);
+        //verificação
+        Assertions.assertNotNull(loginAutenticado);
+    }
+
+    @Test
+    public void naoDeveAutenticarLoginPorLoginInexistente(){
+        //cenário
+        String noUsuario = "User";
+        String coSenha = "senha";
+        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.empty());
+        //ação
+        ErroLoginService erroLoginService = Assertions.assertThrows(ErroLoginService.class,
+                () -> service.autenticar(noUsuario, coSenha));
+        //verificação
+        Assertions.assertEquals("Usuário não encontrado na base de dados", erroLoginService.getMessage());
+    }
+
+    @Test
+    public void naoDeveAutenticarLoginPorSenhaIncorreta() {
+        //cenário
+        Login login = criaLogin();
+        String noUsuario = "User";
+        String coSenha = "senhaErrada";
+        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.of(login));
+        //ação
+        ErroLoginService erroLoginService = Assertions.assertThrows(ErroLoginService.class,
+                () -> service.autenticar(noUsuario, coSenha));
+        //verificação
+        Assertions.assertEquals("Senha inválida", erroLoginService.getMessage());
     }
 
     @Test(expected = Test.None.class)
@@ -86,24 +100,20 @@ public class LoginServiceTest {
         Login login = criaLogin();
         Mockito.when(repository.save(Mockito.any(Login.class))).thenReturn(login);
         //ação
-        Login loginCriado = service.criarLogin(new Login());
+        LoginDTOView loginCriado = service.criarLogin(new Login());
         //verificação
         Assertions.assertNotNull(loginCriado);
-        Assertions.assertEquals(loginCriado.getId(), 1L);
-        Assertions.assertEquals(loginCriado.getNoUsuario(), "Admin");
-        Assertions.assertEquals(loginCriado.getCoSenha(), "Admin");
-        Assertions.assertEquals(loginCriado.getTipoLogin().getId(), 1L);
-        Assertions.assertEquals(loginCriado.getDataCriacao(), LocalDateTime.now());
-        Assertions.assertEquals(loginCriado.getDataAtualizacao(), LocalDateTime.now());
-        Assertions.assertNull(loginCriado.getDataExclusao());
+        Assertions.assertEquals(loginCriado.getId(), login.getId());
+        Assertions.assertEquals(loginCriado.getNoUsuario(), login.getNoUsuario());
+        Assertions.assertEquals(loginCriado.getPerfil(), login.getPerfil().toString());
+
     }
 
-    @Test(expected = RegraNegocioException.class)
-    public void naoDeveCriarLoginComNoUsuarioJaExistente(){
+    @Test(expected = ErroLoginService.class)
+    public void naoDeveCriarLogin(){
         //cenário
+        Mockito.doThrow(ErroLoginService.class).when(service).validarLogin(Mockito.anyString());
         Login login = criaLogin();
-        Mockito.doThrow(RegraNegocioException.class).when(service).validarLogin("Admin");
-        Mockito.when(repository.save(Mockito.any(Login.class))).thenReturn(login);
         //ação
         service.criarLogin(login);
         //verificação
@@ -111,76 +121,103 @@ public class LoginServiceTest {
     }
 
     @Test(expected = Test.None.class)
-    public void deveAtualizarSenhaDeLoginExistente(){
+    public void deveAlterarLoginComSucesso() throws NoSuchAlgorithmException {
         //cenário
         Login login = criaLogin();
-        String senhaAlterada = "senhaAlterada";
+        String novaSenha = "novaSenha";
         Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.of(login));
-        Mockito.when(repository.save(Mockito.any(Login.class))).thenReturn(login);
         //ação
-        Login loginAtualizado = service.alterarSenha(login, senhaAlterada);
+        LoginDTOView loginAtualizado = service.alterarSenha(login, novaSenha);
         //verificação
-        Assertions.assertEquals(senhaAlterada, loginAtualizado.getCoSenha());
+        Mockito.verify(repository, Mockito.times(1)).save(login);
     }
 
-    @Test(expected = ErroAtualizacaoLogin.class)
-    public void naoDeveAtualizarSenhaDeLoginInexistente(){
+    @Test(expected = ErroLoginService.class)
+    public void naoDeveAlterarLogin() throws NoSuchAlgorithmException {
         //cenário
-        Login login = criaLogin();
-        String senhaAlterada = "senhaAlterada";
-        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.of(login));
-        Mockito.when(repository.save(Mockito.any(Login.class))).thenReturn(login);
+        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.empty());
         //ação
-        service.alterarSenha(new Login(), senhaAlterada);
+        service.alterarSenha(new Login(), "senha");
         //verificação
-        Mockito.verify(repository, Mockito.never()).save(login);
+        Mockito.verify(repository, Mockito.never()).save(new Login());
     }
 
     @Test(expected = Test.None.class)
-    public void deveDeletarLoginExistente(){
+    public void deveDeletarLoginComSucesso() {
         //cenário
         Login login = criaLogin();
         Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.of(login));
-        Mockito.when(repository.save(Mockito.any(Login.class))).thenReturn(login);
         //ação
-        Login loginExlcuido = service.deletarLogin(login);
+        service.deletarLogin(login);
         //verificação
-        Assertions.assertNotNull(loginExlcuido.getDataExclusao());
+        Mockito.verify(repository, Mockito.times(1)).save(login);
     }
 
-    @Test(expected = ErroExclusaoLogin.class)
-    public void naoDeveExcluirLoginInexistente(){
+    @Test(expected = ErroLoginService.class)
+    public void naoDeveDeletarLogin() {
         //cenário
-        Login login = criaLogin();
-        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.of(login));
-        Mockito.when(repository.save(Mockito.any(Login.class))).thenReturn(login);
+        Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.empty());
         //ação
         service.deletarLogin(new Login());
         //verificação
-        Mockito.verify(repository, Mockito.never()).save(login);
+        Mockito.verify(repository, Mockito.never()).save(new Login());
     }
 
-    public static TipoLogin criaTipoLogin(){
-
-        return TipoLogin.builder()
-                .id(1L)
-                .noTipoLogin("Administrador")
-                .dataCriacao(LocalDateTime.now())
-                .dataAtualizacao(LocalDateTime.now())
-                .build();
+    @Test(expected = Test.None.class)
+    public void deveBuscarLoginComSucesso() {
+        //cenário
+        Login login = criaLogin();
+        Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(login));
+        //ação
+        Login loginEncontrado = service.buscarLogin(Mockito.anyLong());
+        //verificação
+        Assertions.assertNotNull(loginEncontrado);
     }
 
-    public static Login criaLogin(){
-        TipoLogin tipoLogin = criaTipoLogin();
+    @Test
+    public void naoDeveBuscarLogin() {
+        //cenário
+        Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
+        //ação
+        ErroLoginService erroLoginService = Assertions.assertThrows(ErroLoginService.class,
+                () -> service.buscarLogin(Mockito.anyLong()));
+        //verificação
+        Assertions.assertEquals("Usuário não encontrado na base de dados", erroLoginService.getMessage());
+    }
 
-        return Login.builder()
-                .id(1L)
-                .noUsuario("Admin")
-                .coSenha("Admin")
-                .tipoLogin(tipoLogin)
-                .dataCriacao(LocalDateTime.now())
-                .dataAtualizacao(LocalDateTime.now())
+    @Test(expected = Test.None.class)
+    public void deveAcharTodosOsLoginsComSucesso() {
+        //cenário
+        Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(List.of(new Login()));
+        //ação
+        List<LoginDTOView> loginsEncontrados = service.buscarTodosOsLogins();
+        //verificação
+        Assertions.assertNotNull(loginsEncontrados);
+    }
+
+    @Test
+    public void naoDeveBuscarNenhumLogin() {
+        //cenário
+        Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(Collections.emptyList());
+        //ação
+        List<LoginDTOView> loginsEncontrados = service.buscarTodosOsLogins();
+        //verificação
+        Assertions.assertTrue(loginsEncontrados.isEmpty());
+    }
+
+    private Login criaLogin(){
+        LoginDTO dto =LoginDTO.builder()
+                .noUsuario("User")
+                .perfil("USER")
+                .coSenha("senha")
                 .build();
-    }*/
+
+        Login loginMapeado = mapper.toEntity(dto);
+        loginMapeado.setId(1L);
+        loginMapeado.setDataCriacao(LocalDateTime.now());
+        loginMapeado.setDataAtualizacao(LocalDateTime.now());
+
+        return loginMapeado;
+    }
 
 }

@@ -13,5 +13,6 @@ public interface ComandaService {
     ComandaDTOView alterarSituacao(Comanda comanda, String novaSituacaoComanda);
     Comanda buscarComanda(Long id);
     List<ComandaDTOView> buscarTodasAsComandas();
+    void verificaCliente(String noCliente);
 
 }

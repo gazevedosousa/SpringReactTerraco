@@ -2,11 +2,13 @@ package com.terraco.terracoDaCida.service.impl;
 
 import com.terraco.terracoDaCida.api.dto.ComandaDTOView;
 import com.terraco.terracoDaCida.api.dto.LoginDTOView;
+import com.terraco.terracoDaCida.exceptions.ErroClienteService;
 import com.terraco.terracoDaCida.exceptions.ErroComandaService;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.model.entity.Comanda;
 import com.terraco.terracoDaCida.model.entity.Login;
 import com.terraco.terracoDaCida.model.enums.SituacaoComandaEnum;
+import com.terraco.terracoDaCida.model.repository.ClienteRepository;
 import com.terraco.terracoDaCida.model.repository.ComandaRepository;
 import com.terraco.terracoDaCida.service.ComandaService;
 import jakarta.transaction.Transactional;
@@ -22,24 +24,16 @@ import java.util.List;
 public class ComandaServiceImpl implements ComandaService {
 
     private final ComandaRepository repository;
+    private final ClienteRepository clienteRepository;
     private final ComandaMapper mapper = ComandaMapper.INSTANCE;
 
     @Override
     @Transactional
     public ComandaDTOView criar(Comanda comanda) {
+        verificaCliente(comanda.getCliente().getNoCliente());
         comanda.setDataCriacao(LocalDateTime.now());
         comanda.setDataAtualizacao(LocalDateTime.now());
         return mapper.toDto(repository.save(comanda));
-    }
-
-    @Override
-    @Transactional
-    public ComandaDTOView deletar(Comanda comanda) throws ErroComandaService {
-        Comanda comandaDeletada = repository.findByIdAndDataExclusaoIsNull(comanda.getId())
-                .orElseThrow(() -> new ErroComandaService("Comanda não encontrada na Base de Dados"));
-        comandaDeletada.setDataExclusao(LocalDateTime.now());
-        comandaDeletada.setDataAtualizacao(LocalDateTime.now());
-        return mapper.toDto(repository.save(comandaDeletada));
     }
 
     @Override
@@ -52,6 +46,16 @@ public class ComandaServiceImpl implements ComandaService {
         comandaAlterada.setSituacaoComanda(SituacaoComandaEnum.valueOf(novaSituacaoComanda));
         comandaAlterada.setDataAtualizacao(LocalDateTime.now());
         return mapper.toDto(repository.save(comandaAlterada));
+    }
+
+    @Override
+    @Transactional
+    public ComandaDTOView deletar(Comanda comanda) throws ErroComandaService {
+        Comanda comandaDeletada = repository.findByIdAndDataExclusaoIsNull(comanda.getId())
+                .orElseThrow(() -> new ErroComandaService("Comanda não encontrada na Base de Dados"));
+        comandaDeletada.setDataExclusao(LocalDateTime.now());
+        comandaDeletada.setDataAtualizacao(LocalDateTime.now());
+        return mapper.toDto(repository.save(comandaDeletada));
     }
 
     @Override
@@ -70,5 +74,14 @@ public class ComandaServiceImpl implements ComandaService {
         });
 
         return comandaDtoView;
+    }
+
+    @Override
+    public void verificaCliente(String noCliente) {
+        boolean existe = clienteRepository.existsByNoClienteAndDataExclusaoIsNull(noCliente);
+
+        if(!existe){
+            throw new ErroComandaService("Erro ao criar comanda. Cliente não existe no Banco de Dados");
+        }
     }
 }

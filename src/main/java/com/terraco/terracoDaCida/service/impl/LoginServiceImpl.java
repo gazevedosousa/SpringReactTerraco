@@ -98,7 +98,5 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
-    public LoginDTOView buscarUsuario(String noUsuario) {
-        return mapper.toDto(repository.findByNoUsuarioAndDataExclusaoIsNull(noUsuario).orElse(null));
-    }
+
 }

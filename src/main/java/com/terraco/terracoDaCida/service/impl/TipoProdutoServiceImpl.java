@@ -1,11 +1,8 @@
 package com.terraco.terracoDaCida.service.impl;
 
-import com.terraco.terracoDaCida.api.dto.ProdutoDTOView;
 import com.terraco.terracoDaCida.api.dto.TipoProdutoDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroProdutoService;
 import com.terraco.terracoDaCida.exceptions.ErroTipoProdutoService;
 import com.terraco.terracoDaCida.mapper.TipoProdutoMapper;
-import com.terraco.terracoDaCida.model.entity.Produto;
 import com.terraco.terracoDaCida.model.entity.TipoProduto;
 import com.terraco.terracoDaCida.model.repository.TipoProdutoRepository;
 import com.terraco.terracoDaCida.service.TipoProdutoService;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor

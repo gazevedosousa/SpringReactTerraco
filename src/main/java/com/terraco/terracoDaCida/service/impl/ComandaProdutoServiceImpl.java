@@ -43,15 +43,17 @@ public class ComandaProdutoServiceImpl implements ComandaProdutoService {
     @Override
     @Transactional
     public ComandaProdutoDTOView deletar(ComandaProduto comandaProduto) {
-        comandaProduto.setDataExclusao(LocalDateTime.now());
-        comandaProduto.setDataAtualizacao(LocalDateTime.now());
-        return mapper.toDto(repository.save(comandaProduto));
+        ComandaProduto comandaProdutoBanco = repository.findByIdAndDataExclusaoIsNull(comandaProduto.getId())
+                .orElseThrow(() -> new ErroComandaProdutoService("Lançamento não encontrado"));
+        comandaProdutoBanco.setDataExclusao(LocalDateTime.now());
+        comandaProdutoBanco.setDataAtualizacao(LocalDateTime.now());
+        return mapper.toDto(repository.save(comandaProdutoBanco));
     }
 
     @Override
     public ComandaProduto buscarComandaProduto(Long id) {
         return repository.findByIdAndDataExclusaoIsNull(id)
-                .orElseThrow(() -> new ErroComandaProdutoService("Produto não encontrado nessa comanda"));
+                .orElseThrow(() -> new ErroComandaProdutoService("Lançamento não encontrado"));
     }
 
     @Override
@@ -66,8 +68,8 @@ public class ComandaProdutoServiceImpl implements ComandaProdutoService {
 
     @Override
     public void verificaSituacaoComanda(Comanda comanda) {
-        if(comanda.getSituacaoComanda().equals(SituacaoComandaEnum.PAGA)){
-            throw new ErroComandaProdutoService("Não é possível lançar produto. Comanda já paga anteriormente.");
+        if(comanda.getSituacaoComanda().equals(SituacaoComandaEnum.PAGA) || comanda.getSituacaoComanda().equals(SituacaoComandaEnum.PENDENTE)){
+            throw new ErroComandaProdutoService("Não é possível lançar produto. Comanda " + comanda.getSituacaoComanda() + ".");
         }
     }
 }

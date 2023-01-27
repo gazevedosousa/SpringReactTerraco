@@ -44,7 +44,7 @@ public class TipoProduto {
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime dataExclusao;
 
-    @OneToMany(mappedBy = "tipoProduto", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "tipoProduto", cascade = CascadeType.ALL)
     private List<Produto> produtos;
 
 }
