@@ -25,7 +25,7 @@ public class ProdutoQualifier {
     }
 
     public TipoProduto dtoToEntity(Long id){
-        return tipoProdutoService.buscarTipoProduto(id);
+        return tipoProdutoService.buscarTipoProdutoNaoExcluido(id);
     }
 
     public String entityToDTO(TipoProduto tipoProduto){

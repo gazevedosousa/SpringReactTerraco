@@ -3,7 +3,6 @@ package com.terraco.terracoDaCida.api.controllers;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.terraco.terracoDaCida.api.dto.ProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.ProdutoDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroProdutoService;
 import com.terraco.terracoDaCida.mapper.ProdutoMapper;
 import com.terraco.terracoDaCida.model.entity.Produto;
 import com.terraco.terracoDaCida.service.ProdutoService;
@@ -31,59 +30,40 @@ public class ProdutoController {
     private final ProdutoMapper mapper = ProdutoMapper.INSTANCE;
 
     @PostMapping(value = "/criar")
-    public ResponseEntity criar(@RequestBody ProdutoDTO dto){
-
+    public ResponseEntity criar(@RequestBody ProdutoDTO dto)
+    {
         Produto produto = mapper.toEntity(dto);
-
-        try{
-            ProdutoDTOView produtoCriado = service.criar(produto);
-            return new ResponseEntity(produtoCriado, HttpStatus.CREATED);
-        }catch (ErroProdutoService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        ProdutoDTOView produtoCriado = service.criar(produto);
+        return new ResponseEntity(produtoCriado, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity buscarProduto(@PathVariable("id") Long id)
     {
-        try{
-            ProdutoDTOView dto = mapper.toDto(service.buscarProduto(id));
-            return new ResponseEntity(dto, HttpStatus.OK);
-        }catch (ErroProdutoService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        ProdutoDTOView dto = mapper.toDto(service.buscarProdutoNaoExcluido(id));
+        return new ResponseEntity(dto, HttpStatus.OK);
     }
 
     @GetMapping(value = "/todos")
-    public ResponseEntity buscarTodosOsProdutos(){
-        try {
-            List<ProdutoDTOView> produtos = service.buscarTodosOsProdutos();
-            return new ResponseEntity(produtos, HttpStatus.OK);
-        } catch (ErroProdutoService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity buscarTodosOsProdutos()
+    {
+        List<ProdutoDTOView> produtos = service.buscarTodosOsProdutosNaoExcluidos();
+        return new ResponseEntity(produtos, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/atualizar")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody ProdutoDTO dto){
-        Produto produto = service.buscarProduto(id);
-        try{
-            ProdutoDTOView produtoAtualizado = service.atualizar(produto, dto.getVrProduto());
-            return new ResponseEntity(produtoAtualizado, HttpStatus.OK);
-        }catch (ErroProdutoService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody ProdutoDTO dto)
+    {
+        Produto produto = service.buscarProdutoNaoExcluido(id);
+        ProdutoDTOView produtoAtualizado = service.atualizar(produto, dto.getVrProduto());
+        return new ResponseEntity(produtoAtualizado, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}/deletar")
     public ResponseEntity deletar(@PathVariable("id") Long id){
 
-        Produto produto = service.buscarProduto(id);
-        try{
-            ProdutoDTOView produtoDeletado = service.deletar(produto);
-            return new ResponseEntity(produtoDeletado, HttpStatus.OK);
-        }catch (ErroProdutoService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Produto produto = service.buscarProdutoNaoExcluido(id);
+        ProdutoDTOView produtoDeletado = service.deletar(produto);
+        return new ResponseEntity(produtoDeletado, HttpStatus.OK);
     }
 }

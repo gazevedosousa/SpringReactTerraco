@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,9 @@ public class ComandaProduto {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Produto produto;
+
+    @Column
+    private BigDecimal vrComandaProduto;
 
     @Column(nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)

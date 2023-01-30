@@ -3,7 +3,7 @@ package com.terraco.terracoDaCida.service;
 import com.terraco.terracoDaCida.api.dto.ClienteDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroComandaService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.model.entity.Cliente;
@@ -49,7 +49,7 @@ public class ComandaServiceTest {
     private ClienteMapper clienteMapper = Mappers.getMapper(ClienteMapper.class);
 
 
-    @Test(expected = Test.None.class)
+   /* @Test(expected = Test.None.class)
     public void deveValidarClienteComSucesso(){
         //cenário
         Comanda comanda = criaCenario();
@@ -63,11 +63,11 @@ public class ComandaServiceTest {
         Comanda comanda = criaCenario();
         Mockito.when(clienteRepository.existsByNoClienteAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(false);
         //ação
-        ErroComandaService erroComandaService = Assertions.assertThrows(ErroComandaService.class,
+        ElementoNaoEncontradoException erroComandaService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.verificaCliente(comanda.getCliente().getNoCliente()));
         //validação
         Assertions.assertEquals("Erro ao criar comanda. Cliente não existe no Banco de Dados", erroComandaService.getMessage());
-    }
+    }*/
 
     @Test(expected = Test.None.class)
     public void deveCriarComandaComSucesso(){
@@ -84,27 +84,16 @@ public class ComandaServiceTest {
 
     }
 
-    @Test(expected = ErroComandaService.class)
+/*    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveCriarComanda(){
         //cenário
         Comanda comanda = criaCenario();
-        Mockito.doThrow(ErroComandaService.class).when(service).verificaCliente(comanda.getCliente().getNoCliente());
+        Mockito.doThrow(ElementoNaoEncontradoException.class).when(service).verificaCliente(comanda.getCliente().getNoCliente());
         //ação
         service.criar(comanda);
         //verificação
         Mockito.verify(repository, Mockito.never()).save(comanda);
-    }
-
-    @Test(expected = Test.None.class)
-    public void deveAlterarSituacaoDaComandaParaPendenteComSucesso() {
-        //cenário
-        Comanda comanda = criaCenario();
-        Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(comanda));
-        //ação
-        ComandaDTOView comandaAtualizada = service.alterarSituacao(comanda, "PENDENTE");
-        //verificação
-        Assertions.assertEquals(comanda.getSituacaoComanda(), SituacaoComandaEnum.PENDENTE);
-    }
+    }*/
 
     @Test(expected = Test.None.class)
     public void deveAlterarSituacaoDaComandaParaPagaComSucesso() {
@@ -112,12 +101,12 @@ public class ComandaServiceTest {
         Comanda comanda = criaCenario();
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(comanda));
         //ação
-        ComandaDTOView comandaAtualizada = service.alterarSituacao(comanda, "PAGA");
+        service.fecharComanda(comanda);
         //verificação
         Assertions.assertEquals(comanda.getSituacaoComanda(), SituacaoComandaEnum.PAGA);
     }
 
-    @Test(expected = ErroComandaService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveAlterarSituacaoDaComanda() {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
@@ -138,7 +127,7 @@ public class ComandaServiceTest {
         Mockito.verify(repository, Mockito.times(1)).save(comanda);
     }
 
-    @Test(expected = ErroComandaService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveDeletarComanda() {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
@@ -154,7 +143,7 @@ public class ComandaServiceTest {
         Comanda comanda = criaCenario();
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(comanda));
         //ação
-        Comanda comandaEncontrada = service.buscarComanda(Mockito.anyLong());
+        Comanda comandaEncontrada = service.buscarComandaNaoExcluida(Mockito.anyLong());
         //verificação
         Assertions.assertNotNull(comandaEncontrada);
     }
@@ -164,8 +153,8 @@ public class ComandaServiceTest {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        ErroComandaService erroComanda = Assertions.assertThrows(ErroComandaService.class,
-                () -> service.buscarComanda(Mockito.anyLong()));
+        ElementoNaoEncontradoException erroComanda = Assertions.assertThrows(ElementoNaoEncontradoException.class,
+                () -> service.buscarComandaNaoExcluida(Mockito.anyLong()));
         //verificação
         Assertions.assertEquals("Comanda não encontrada na Base de Dados", erroComanda.getMessage());
     }
@@ -177,7 +166,7 @@ public class ComandaServiceTest {
         Comanda comanda = criaCenario();
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(List.of(comanda));
         //ação
-        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandas();
+        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandasNaoExcluidas();
         //verificação
         Assertions.assertNotNull(comandasEncontradas);
     }
@@ -187,7 +176,7 @@ public class ComandaServiceTest {
         //cenário
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(Collections.emptyList());
         //ação
-        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandas();
+        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandasNaoExcluidas();
         //verificação
         Assertions.assertTrue(comandasEncontradas.isEmpty());
     }

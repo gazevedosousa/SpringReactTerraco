@@ -5,7 +5,7 @@ import com.terraco.terracoDaCida.api.dto.ComandaDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.ProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.TipoProdutoDTO;
-import com.terraco.terracoDaCida.exceptions.ErroComandaProdutoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.mapper.ComandaProdutoMapper;
@@ -87,12 +87,12 @@ public class ComandaProdutoRepositoryTest {
         ComandaProduto comandaProdutoPersistida = entityManager.persist(criaComandaProduto(comandaPersistida.getId(), produtoPersistido.getId()));
         //ação
         ComandaProduto comandaProduto = repository.findByIdAndDataExclusaoIsNull(comandaProdutoPersistida.getId())
-                .orElseThrow(() -> new ErroComandaProdutoService("Comanda Produto não Encontrada") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda Produto não Encontrada") );
         //verificação
         Assertions.assertNotNull(comandaProduto);
     }
 
-    @Test(expected = ErroComandaProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void deveRetornarErroQuandoNaoAcharUmaComandaProdutoComBaseNoId(){
         //cenário
         Cliente clientePersistido = entityManager.persist(criaCliente());
@@ -102,7 +102,7 @@ public class ComandaProdutoRepositoryTest {
         ComandaProduto comandaProdutoPersistida = entityManager.persist(criaComandaProduto(comandaPersistida.getId(), produtoPersistido.getId()));
         //ação
         ComandaProduto comandaProduto = repository.findByIdAndDataExclusaoIsNull(2L)
-                .orElseThrow(() -> new ErroComandaProdutoService("Comanda Produto não encontrada") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda Produto não encontrada") );
         //verificação
         Assertions.assertNotNull(comandaProduto);
     }

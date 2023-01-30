@@ -4,7 +4,7 @@ import com.terraco.terracoDaCida.api.dto.ClienteDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaDTO;
 import com.terraco.terracoDaCida.api.dto.PagamentoDTO;
 import com.terraco.terracoDaCida.api.dto.PagamentoDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroPagamentoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.mapper.PagamentoMapper;
@@ -72,7 +72,7 @@ public class PagamentoServiceTest {
         Pagamento pagamento = criaCenario();
         pagamento.getComanda().setSituacaoComanda(SituacaoComandaEnum.PAGA);
         //ação
-        ErroPagamentoService erroPagamentoService = Assertions.assertThrows(ErroPagamentoService.class,
+        ElementoNaoEncontradoException erroPagamentoService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.validarPagamento(pagamento.getComanda()));
         //validação
         Assertions.assertEquals("Não é possível efetuar pagamento. Comanda já paga anteriormente.", erroPagamentoService.getMessage());
@@ -84,7 +84,7 @@ public class PagamentoServiceTest {
         Pagamento pagamento = criaCenario();
         Mockito.when(repository.save(pagamento)).thenReturn(pagamento);
         //ação
-        PagamentoDTOView pagamentoCriado = service.criar(pagamento);
+        PagamentoDTOView pagamentoCriado = service.pagarParcial(pagamento);
         //verificação
         Assertions.assertNotNull(pagamentoCriado);
         Assertions.assertEquals(pagamentoCriado.getId(), pagamento.getId());
@@ -94,13 +94,13 @@ public class PagamentoServiceTest {
 
     }
 
-    @Test(expected = ErroPagamentoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveCriarPagamento(){
         //cenário
         Pagamento pagamento = criaCenario();
-        Mockito.doThrow(ErroPagamentoService.class).when(service).validarPagamento(pagamento.getComanda());
+        Mockito.doThrow(ElementoNaoEncontradoException.class).when(service).validarPagamento(pagamento.getComanda());
         //ação
-        service.criar(pagamento);
+        service.pagarParcial(pagamento);
         //verificação
         Mockito.verify(repository, Mockito.never()).save(pagamento);
     }
@@ -111,17 +111,17 @@ public class PagamentoServiceTest {
         Pagamento pagamento = criaCenario();
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(pagamento));
         //ação
-        service.deletar(pagamento);
+        service.estornarPagamento(pagamento);
         //verificação
         Mockito.verify(repository, Mockito.times(1)).save(pagamento);
     }
 
-    @Test(expected = ErroPagamentoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveDeletarPagamento() {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        service.deletar(new Pagamento());
+        service.estornarPagamento(new Pagamento());
         //verificação
         Mockito.verify(repository, Mockito.never()).save(new Pagamento());
     }
@@ -142,7 +142,7 @@ public class PagamentoServiceTest {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        ErroPagamentoService erroPagamentoService = Assertions.assertThrows(ErroPagamentoService.class,
+        ElementoNaoEncontradoException erroPagamentoService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.buscarPagamento(Mockito.anyLong()));
         //verificação
         Assertions.assertEquals("Pagamento não encontrado na Base de Dados", erroPagamentoService.getMessage());

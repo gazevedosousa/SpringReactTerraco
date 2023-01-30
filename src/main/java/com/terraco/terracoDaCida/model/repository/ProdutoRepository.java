@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     @Query("Select p from Produto p where p.dataExclusao is null")
     List<Produto> findAllWhereDataExclusaoIsNull();
+    @Query("Select p from Produto p join p.tipoProduto tp where tp.id = :idTipoProduto and p.dataExclusao is null")
+    List<Produto> findAllWhereTipoProdutoAndDataExclusaoIsNull(Long idTipoProduto);
     boolean existsByNoProdutoAndDataExclusaoIsNull(String noProduto);
     Optional<Produto> findByIdAndDataExclusaoIsNull(Long idProduto);
 }

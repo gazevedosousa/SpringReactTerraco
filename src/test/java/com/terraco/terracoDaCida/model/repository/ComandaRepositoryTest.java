@@ -2,7 +2,7 @@ package com.terraco.terracoDaCida.model.repository;
 
 import com.terraco.terracoDaCida.api.dto.ClienteDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaDTO;
-import com.terraco.terracoDaCida.exceptions.ErroComandaService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.model.entity.Cliente;
@@ -57,22 +57,22 @@ public class ComandaRepositoryTest {
     }
 
     @Test
-    public void deveRetornarUmUsuarioComBaseNoIdAchadoNoBanco(){
+    public void deveAcharUmaComandaQueNaoEstaExcluida(){
         //cenário
         Cliente clientePersistido = entityManager.persist(criaCliente());
         Comanda comandaPersistida = entityManager.persist(criaComanda(clientePersistido.getId()));
         //ação
         Comanda comandaDoBanco = repository.findByIdAndDataExclusaoIsNull(comandaPersistida.getId())
-                .orElseThrow(() -> new ErroComandaService("Comanda não Encontrada") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda não Encontrada") );
         //verificação
         Assertions.assertNotNull(comandaDoBanco);
     }
 
-    @Test(expected = ErroComandaService.class)
-    public void deveRetornarErroAoNaoAcharComandaComBaseNoId(){
+    @Test(expected = ElementoNaoEncontradoException.class)
+    public void deveRetornarErroAoNaoAcharComandaComBaseNoIdNaoExcluida(){
         //verificação
         Comanda comanda = repository.findByIdAndDataExclusaoIsNull(1l)
-                .orElseThrow(() -> new ErroComandaService("Comanda não Encontrada") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda não Encontrada") );
     }
 
     private Cliente criaCliente(){

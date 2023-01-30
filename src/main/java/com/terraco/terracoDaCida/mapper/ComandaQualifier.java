@@ -2,14 +2,9 @@ package com.terraco.terracoDaCida.mapper;
 
 import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTOView;
 import com.terraco.terracoDaCida.model.entity.Cliente;
-import com.terraco.terracoDaCida.model.entity.Comanda;
-import com.terraco.terracoDaCida.model.entity.ComandaProduto;
-import com.terraco.terracoDaCida.model.entity.Produto;
-import com.terraco.terracoDaCida.model.enums.SituacaoComandaEnum;
 import com.terraco.terracoDaCida.service.ClienteService;
 import com.terraco.terracoDaCida.service.ComandaProdutoService;
 import org.mapstruct.Mapper;
-import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +32,7 @@ public class ComandaQualifier {
     }
 
     public Cliente dtoToEntity(Long id){
-        return clienteService.buscarCliente(id);
+        return clienteService.buscarClienteNaoExcluido(id);
     }
     public String entityToDTO(Cliente cliente){
         return cliente.getNoCliente();

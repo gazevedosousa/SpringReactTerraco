@@ -3,7 +3,6 @@ package com.terraco.terracoDaCida.api.controllers;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.terraco.terracoDaCida.api.dto.LoginDTO;
 import com.terraco.terracoDaCida.api.dto.LoginDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroLoginService;
 import com.terraco.terracoDaCida.mapper.LoginMapper;
 import com.terraco.terracoDaCida.model.entity.Login;
 import com.terraco.terracoDaCida.service.LoginService;
@@ -32,72 +31,47 @@ public class LoginController {
     private final LoginMapper mapper = LoginMapper.INSTANCE;
 
     @PostMapping(value = "/autenticar")
-    public ResponseEntity autenticar(@RequestBody LoginDTO dto)
+    public ResponseEntity autenticar(@RequestBody LoginDTO dto) throws NoSuchAlgorithmException
     {
-        try{
-            LoginDTOView login = mapper.toDto(service.autenticar(dto.getNoUsuario(), dto.getCoSenha()));
-            return new ResponseEntity(login, HttpStatus.OK);
-        }catch (ErroLoginService | NoSuchAlgorithmException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        LoginDTOView login = mapper.toDto(service.autenticar(dto.getNoUsuario(), dto.getCoSenha()));
+        return new ResponseEntity(login, HttpStatus.OK);
     }
 
     @PostMapping(value = "/criar")
-    public ResponseEntity criar(@RequestBody LoginDTO dto){
-
+    public ResponseEntity criar(@RequestBody LoginDTO dto)
+    {
         Login login = mapper.toEntity(dto);
-
-        try{
-            LoginDTOView loginCriado = service.criarLogin(login);
-            return new ResponseEntity(loginCriado, HttpStatus.CREATED);
-        }catch (ErroLoginService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        LoginDTOView loginCriado = service.criarLogin(login);
+        return new ResponseEntity(loginCriado, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity buscarLogin(@PathVariable("id") Long id)
     {
-        try{
-            LoginDTOView dto = mapper.toDto(service.buscarLogin(id));
-            return new ResponseEntity(dto, HttpStatus.OK);
-        }catch (ErroLoginService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        LoginDTOView dto = mapper.toDto(service.buscarLogin(id));
+        return new ResponseEntity(dto, HttpStatus.OK);
     }
 
     @GetMapping(value = "/todos")
-    public ResponseEntity buscarTodosOsLogins(){
-        try {
-            List<LoginDTOView> loginDTOViews = service.buscarTodosOsLogins();
-            return new ResponseEntity(loginDTOViews, HttpStatus.OK);
-        } catch (ErroLoginService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity buscarTodosOsLogins()
+    {
+        List<LoginDTOView> loginDTOViews = service.buscarTodosOsLogins();
+        return new ResponseEntity(loginDTOViews, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/atualizar")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody LoginDTO dto){
+    public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody LoginDTO dto) throws NoSuchAlgorithmException
+    {
         Login login = service.buscarLogin(id);
-        try{
-            LoginDTOView loginAtualizado = service.alterarSenha(login, dto.getCoSenha());
-            return new ResponseEntity(loginAtualizado, HttpStatus.OK);
-        }catch (ErroLoginService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        LoginDTOView loginAtualizado = service.alterarSenha(login, dto.getCoSenha());
+        return new ResponseEntity(loginAtualizado, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}/deletar")
-    public ResponseEntity deletar(@PathVariable("id") Long id){
-
+    public ResponseEntity deletar(@PathVariable("id") Long id)
+    {
         Login login = service.buscarLogin(id);
-        try{
-            LoginDTOView loginDeletado = service.deletarLogin(login);
-            return new ResponseEntity(loginDeletado, HttpStatus.OK);
-        }catch (ErroLoginService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        LoginDTOView loginDeletado = service.deletarLogin(login);
+        return new ResponseEntity(loginDeletado, HttpStatus.OK);
     }
 }

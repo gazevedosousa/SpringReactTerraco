@@ -3,7 +3,7 @@ package com.terraco.terracoDaCida.api.controllers;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.terraco.terracoDaCida.api.dto.PagamentoDTO;
 import com.terraco.terracoDaCida.api.dto.PagamentoDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroProdutoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.PagamentoMapper;
 import com.terraco.terracoDaCida.model.entity.Pagamento;
 import com.terraco.terracoDaCida.service.PagamentoService;
@@ -33,9 +33,9 @@ public class PagamentoController {
         Pagamento pagamento = mapper.toEntity(dto);
 
         try{
-            PagamentoDTOView pagamentoCriado = service.criar(pagamento);
+            PagamentoDTOView pagamentoCriado = service.pagarParcial(pagamento);
             return new ResponseEntity(pagamentoCriado, HttpStatus.CREATED);
-        }catch (ErroProdutoService e){
+        }catch (ElementoNaoEncontradoException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -46,7 +46,7 @@ public class PagamentoController {
         try{
             PagamentoDTOView dto = mapper.toDto(service.buscarPagamento(id));
             return new ResponseEntity(dto, HttpStatus.OK);
-        }catch (ErroProdutoService e){
+        }catch (ElementoNaoEncontradoException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -56,9 +56,9 @@ public class PagamentoController {
 
         Pagamento pagamento = service.buscarPagamento(id);
         try{
-            PagamentoDTOView pagamentoDeletado = service.deletar(pagamento);
+            PagamentoDTOView pagamentoDeletado = service.estornarPagamento(pagamento);
             return new ResponseEntity(pagamentoDeletado, HttpStatus.OK);
-        }catch (ErroProdutoService e){
+        }catch (ElementoNaoEncontradoException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

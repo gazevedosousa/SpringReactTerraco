@@ -3,7 +3,6 @@ package com.terraco.terracoDaCida.api.controllers;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.terraco.terracoDaCida.api.dto.ComandaDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroComandaService;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.model.entity.Comanda;
 import com.terraco.terracoDaCida.service.ComandaService;
@@ -31,59 +30,48 @@ public class ComandaController {
     private final ComandaMapper mapper = ComandaMapper.INSTANCE;
 
     @PostMapping(value = "/criar")
-    public ResponseEntity criar(@RequestBody ComandaDTO dto){
-
+    public ResponseEntity criar(@RequestBody ComandaDTO dto)
+    {
         Comanda comanda = mapper.toEntity(dto);
-
-        try{
-            ComandaDTOView comandaCriada = service.criar(comanda);
-            return new ResponseEntity(comandaCriada, HttpStatus.CREATED);
-        }catch (ErroComandaService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        ComandaDTOView comandaCriada = service.criar(comanda);
+        return new ResponseEntity(comandaCriada, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity buscarComanda(@PathVariable("id") Long id)
     {
-        try{
-            ComandaDTOView dto = mapper.toDto(service.buscarComanda(id));
-            return new ResponseEntity(dto, HttpStatus.OK);
-        }catch (ErroComandaService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        ComandaDTOView dto = mapper.toDto(service.buscarComandaNaoExcluida(id));
+        return new ResponseEntity(dto, HttpStatus.OK);
     }
 
     @GetMapping(value = "/todas")
-    public ResponseEntity buscarTodasAsComandas(){
-        try {
-            List<ComandaDTOView> comandas = service.buscarTodasAsComandas();
-            return new ResponseEntity(comandas, HttpStatus.OK);
-        } catch (ErroComandaService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity buscarTodasAsComandas()
+    {
+        List<ComandaDTOView> comandas = service.buscarTodasAsComandasNaoExcluidas();
+        return new ResponseEntity(comandas, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}/atualizar")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody ComandaDTO dto){
-        Comanda comanda = service.buscarComanda(id);
-        try{
-            ComandaDTOView comandaAtualizada = service.alterarSituacao(comanda, dto.getSituacaoComanda());
-            return new ResponseEntity(comandaAtualizada, HttpStatus.OK);
-        }catch (ErroComandaService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PutMapping(value = "/{id}/fecharComanda")
+    public ResponseEntity fecharComanda(@PathVariable("id") Long id)
+    {
+        Comanda comanda = service.buscarComandaNaoExcluida(id);
+        ComandaDTOView comandaFechada = service.fecharComanda(comanda);
+        return new ResponseEntity(comandaFechada, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/reabrirComanda")
+    public ResponseEntity reabrirComanda(@PathVariable("id") Long id)
+    {
+        Comanda comanda = service.buscarComandaNaoExcluida(id);
+        ComandaDTOView comandaReaberta = service.reabrirComanda(comanda);
+        return new ResponseEntity(comandaReaberta, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}/deletar")
-    public ResponseEntity deletar(@PathVariable("id") Long id){
-
-        Comanda comanda = service.buscarComanda(id);
-        try{
-            ComandaDTOView comandaDeletada = service.deletar(comanda);
-            return new ResponseEntity(comandaDeletada, HttpStatus.OK);
-        }catch (ErroComandaService e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity deletar(@PathVariable("id") Long id)
+    {
+        Comanda comanda = service.buscarComandaNaoExcluida(id);
+        ComandaDTOView comandaDeletada = service.deletar(comanda);
+        return new ResponseEntity(comandaDeletada, HttpStatus.OK);
     }
 }

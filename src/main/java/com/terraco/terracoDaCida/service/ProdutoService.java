@@ -11,8 +11,11 @@ public interface ProdutoService {
     ProdutoDTOView criar(Produto produto);
     ProdutoDTOView atualizar(Produto produto, BigDecimal novoVrProduto);
     ProdutoDTOView deletar(Produto produto);
+    Produto buscarProdutoNaoExcluido(Long id);
+    List<ProdutoDTOView> buscarTodosOsProdutosNaoExcluidos();
     Produto buscarProduto(Long id);
     List<ProdutoDTOView> buscarTodosOsProdutos();
+    List<ProdutoDTOView> buscarProdutosPorTipo(Long idTipoProduto);
     void validarProduto(String noProduto);
 
 }

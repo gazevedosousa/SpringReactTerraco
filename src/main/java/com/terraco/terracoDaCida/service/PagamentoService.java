@@ -9,8 +9,9 @@ import java.util.List;
 
 public interface PagamentoService {
 
-    PagamentoDTOView criar(Pagamento pagamento);
-    PagamentoDTOView deletar(Pagamento pagamento);
+    PagamentoDTOView pagarParcial(Pagamento pagamento);
+    PagamentoDTOView pagarTotal(Pagamento pagamento);
+    PagamentoDTOView estornarPagamento(Pagamento pagamento);
     Pagamento buscarPagamento(Long id);
     List<PagamentoDTOView> buscarPagamentosDeUmaComanda(Long idComanda);
     void validarPagamento(Comanda comanda);

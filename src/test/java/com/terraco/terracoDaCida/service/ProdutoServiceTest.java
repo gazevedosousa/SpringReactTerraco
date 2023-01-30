@@ -3,7 +3,7 @@ package com.terraco.terracoDaCida.service;
 import com.terraco.terracoDaCida.api.dto.ProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.ProdutoDTOView;
 import com.terraco.terracoDaCida.api.dto.TipoProdutoDTO;
-import com.terraco.terracoDaCida.exceptions.ErroProdutoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ProdutoMapper;
 import com.terraco.terracoDaCida.mapper.TipoProdutoMapper;
 import com.terraco.terracoDaCida.model.entity.Produto;
@@ -55,7 +55,7 @@ public class ProdutoServiceTest {
         //validação
         service.validarProduto("Produto");
     }
-    @Test(expected = ErroProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void deveLancarErroAoValidar(){
         //cenário
         Mockito.when(repository.existsByNoProdutoAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(true);
@@ -80,10 +80,10 @@ public class ProdutoServiceTest {
 
     }
 
-    @Test(expected = ErroProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveCriarProduto(){
         //cenário
-        Mockito.doThrow(ErroProdutoService.class).when(service).validarProduto(Mockito.anyString());
+        Mockito.doThrow(ElementoNaoEncontradoException.class).when(service).validarProduto(Mockito.anyString());
         Produto produto = criaCenario();
         //ação
         service.criar(produto);
@@ -111,7 +111,7 @@ public class ProdutoServiceTest {
         BigDecimal novoVrProduto = BigDecimal.ONE;
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        ErroProdutoService erroProdutoService = Assertions.assertThrows(ErroProdutoService.class,
+        ElementoNaoEncontradoException erroProdutoService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.atualizar(produto, novoVrProduto));
         //verificação
         Assertions.assertEquals("Produto não encontrado na Base de Dados", erroProdutoService.getMessage());
@@ -128,7 +128,7 @@ public class ProdutoServiceTest {
         Mockito.verify(repository, Mockito.times(1)).save(produto);
     }
 
-    @Test(expected = ErroProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveDeletarProduto() {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
@@ -144,7 +144,7 @@ public class ProdutoServiceTest {
         Produto produto = criaCenario();
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(produto));
         //ação
-        Produto produtoEncontrado = service.buscarProduto(Mockito.anyLong());
+        Produto produtoEncontrado = service.buscarProdutoNaoExcluido(Mockito.anyLong());
         //verificação
         Assertions.assertNotNull(produtoEncontrado);
     }
@@ -154,8 +154,8 @@ public class ProdutoServiceTest {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        ErroProdutoService erroProdutoService = Assertions.assertThrows(ErroProdutoService.class,
-                () -> service.buscarProduto(Mockito.anyLong()));
+        ElementoNaoEncontradoException erroProdutoService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
+                () -> service.buscarProdutoNaoExcluido(Mockito.anyLong()));
         //verificação
         Assertions.assertEquals("Produto não encontrado na Base de Dados", erroProdutoService.getMessage());
     }
@@ -166,7 +166,7 @@ public class ProdutoServiceTest {
         Produto produto = criaCenario();
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(List.of(produto));
         //ação
-        List<ProdutoDTOView> produtosEncontrados = service.buscarTodosOsProdutos();
+        List<ProdutoDTOView> produtosEncontrados = service.buscarTodosOsProdutosNaoExcluidos();
         //verificação
         Assertions.assertNotNull(produtosEncontrados);
     }
@@ -176,7 +176,7 @@ public class ProdutoServiceTest {
         //cenário
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(Collections.emptyList());
         //ação
-        List<ProdutoDTOView> produtosEncontrados = service.buscarTodosOsProdutos();
+        List<ProdutoDTOView> produtosEncontrados = service.buscarTodosOsProdutosNaoExcluidos();
         //verificação
         Assertions.assertTrue(produtosEncontrados.isEmpty());
     }

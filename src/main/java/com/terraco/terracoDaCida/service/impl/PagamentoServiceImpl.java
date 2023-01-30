@@ -1,34 +1,35 @@
 package com.terraco.terracoDaCida.service.impl;
 
-import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTOView;
 import com.terraco.terracoDaCida.api.dto.PagamentoDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroPagamentoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
+import com.terraco.terracoDaCida.exceptions.RegraNegocioException;
 import com.terraco.terracoDaCida.mapper.PagamentoMapper;
 import com.terraco.terracoDaCida.model.entity.Comanda;
-import com.terraco.terracoDaCida.model.entity.ComandaProduto;
 import com.terraco.terracoDaCida.model.entity.Pagamento;
 import com.terraco.terracoDaCida.model.enums.SituacaoComandaEnum;
 import com.terraco.terracoDaCida.model.repository.PagamentoRepository;
+import com.terraco.terracoDaCida.service.ComandaService;
 import com.terraco.terracoDaCida.service.PagamentoService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class PagamentoServiceImpl implements PagamentoService {
 
     private final PagamentoRepository repository;
+
     private final PagamentoMapper mapper = PagamentoMapper.INSTANCE;
 
     @Override
     @Transactional
-    public PagamentoDTOView criar(Pagamento pagamento) {
+    public PagamentoDTOView pagarParcial(Pagamento pagamento) {
         validarPagamento(pagamento.getComanda());
         pagamento.setDataCriacao(LocalDateTime.now());
         pagamento.setDataAtualizacao(LocalDateTime.now());
@@ -36,19 +37,27 @@ public class PagamentoServiceImpl implements PagamentoService {
     }
 
     @Override
-    @Transactional
-    public PagamentoDTOView deletar(Pagamento pagamento) {
-        Pagamento pagamentoDeletado = repository.findByIdAndDataExclusaoIsNull(pagamento.getId())
-                .orElseThrow(() -> new ErroPagamentoService("Pagamento não encontrado na Base de Dados"));
-        pagamentoDeletado.setDataExclusao(LocalDateTime.now());
-        pagamentoDeletado.setDataAtualizacao(LocalDateTime.now());
-        return mapper.toDto(repository.save(pagamentoDeletado));
+    public PagamentoDTOView pagarTotal(Pagamento pagamento) {
+        validarPagamento(pagamento.getComanda());
+        pagamento.setDataCriacao(LocalDateTime.now());
+        pagamento.setDataAtualizacao(LocalDateTime.now());
+        return mapper.toDto(repository.save(pagamento));
     }
+
+    @Override
+    public PagamentoDTOView estornarPagamento(Pagamento pagamento) {
+        Pagamento pagamentoEstornado = repository.findByIdAndDataExclusaoIsNull(pagamento.getId())
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Pagamento não encontrado no Banco de Dados"));
+        pagamentoEstornado.setDataExclusao(LocalDateTime.now());
+        pagamentoEstornado.setDataAtualizacao(LocalDateTime.now());
+        return mapper.toDto(repository.save(pagamentoEstornado));
+    }
+
 
     @Override
     public Pagamento buscarPagamento(Long id) {
         return repository.findByIdAndDataExclusaoIsNull(id)
-                .orElseThrow(() -> new ErroPagamentoService("Pagamento não encontrado na Base de Dados"));
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Pagamento não encontrado no Banco de Dados"));
     }
 
     @Override
@@ -58,13 +67,17 @@ public class PagamentoServiceImpl implements PagamentoService {
         pagamentoList.forEach(pagamento -> {
             pagamentoDTOViews.add(mapper.toDto(pagamento));
         });
+
+        if(pagamentoDTOViews.isEmpty()){
+            throw new ElementoNaoEncontradoException("Nenhum Pagamento encontrado no Banco de Dados");
+        }
         return pagamentoDTOViews;
     }
 
     @Override
     public void validarPagamento(Comanda comanda) {
         if(comanda.getSituacaoComanda().equals(SituacaoComandaEnum.PAGA)){
-            throw new ErroPagamentoService("Não é possível efetuar pagamento. Comanda já paga anteriormente.");
+            throw new RegraNegocioException("Não é possível realizar operação. Comanda já paga anteriormente.");
         }
     }
 }

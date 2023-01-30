@@ -1,5 +1,6 @@
 package com.terraco.terracoDaCida.model.enums;
 
-public enum TipoPagamentoEnum {
+public enum TipoPagamentoEnum
+{
     DEBITO, CREDITO, DINHEIRO, PIX
 }

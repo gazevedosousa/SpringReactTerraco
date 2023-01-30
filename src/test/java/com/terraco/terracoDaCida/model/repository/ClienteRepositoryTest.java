@@ -1,7 +1,7 @@
 package com.terraco.terracoDaCida.model.repository;
 
 import com.terraco.terracoDaCida.api.dto.ClienteDTO;
-import com.terraco.terracoDaCida.exceptions.ErroClienteService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.model.entity.Cliente;
 import org.junit.Test;
@@ -79,16 +79,16 @@ public class ClienteRepositoryTest {
         Cliente clientePersistido = entityManager.persist(criaCliente());
         //ação
         Cliente clienteDoBanco = repository.findByIdAndDataExclusaoIsNull(clientePersistido.getId())
-                .orElseThrow(() -> new ErroClienteService("Cliente não Encontrado") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não Encontrado") );
         //verificação
         Assertions.assertNotNull(clienteDoBanco);
     }
 
-    @Test(expected = ErroClienteService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void deveRetornarErroAoNaoAcharUsuarioComBaseNoId(){
         //verificação
         Cliente clienteDoBanco = repository.findByIdAndDataExclusaoIsNull(1l)
-                .orElseThrow(() -> new ErroClienteService("Cliente não Encontrado") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não Encontrado") );
     }
 
     private Cliente criaCliente(){

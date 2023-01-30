@@ -3,12 +3,8 @@ package com.terraco.terracoDaCida.mapper;
 import com.terraco.terracoDaCida.model.entity.Comanda;
 import com.terraco.terracoDaCida.service.ComandaService;
 import org.mapstruct.Mapper;
-import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @Mapper

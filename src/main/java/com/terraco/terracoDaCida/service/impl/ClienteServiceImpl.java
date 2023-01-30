@@ -1,11 +1,14 @@
 package com.terraco.terracoDaCida.service.impl;
 
 import com.terraco.terracoDaCida.api.dto.ClienteDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroClienteService;
+import com.terraco.terracoDaCida.api.dto.ComandaDTOView;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
+import com.terraco.terracoDaCida.exceptions.RegraNegocioException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.model.entity.Cliente;
 import com.terraco.terracoDaCida.model.repository.ClienteRepository;
 import com.terraco.terracoDaCida.service.ClienteService;
+import com.terraco.terracoDaCida.service.ComandaService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +23,7 @@ public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository repository;
     private final ClienteMapper mapper = ClienteMapper.INSTANCE;
-
+    private final ComandaService comandaService;
 
     @Override
     @Transactional
@@ -35,7 +38,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional
     public ClienteDTOView atualizar(Cliente cliente, String novoCelCliente, String novoEmailCliente) {
         Cliente clienteAtualizado = repository.findByIdAndDataExclusaoIsNull(cliente.getId())
-                .orElseThrow(() -> new ErroClienteService("Cliente não encontrado no Banco de Dados"));
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não encontrado no Banco de Dados"));
 
         if(!novoCelCliente.isEmpty()){
             clienteAtualizado.setCelCliente(novoCelCliente);
@@ -52,8 +55,9 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public ClienteDTOView deletar(Cliente cliente) {
+        validarDelecaoCliente(cliente.getId());
         Cliente clienteDeletado = repository.findByIdAndDataExclusaoIsNull(cliente.getId())
-                .orElseThrow(() -> new ErroClienteService("Cliente não encontrado no Banco de Dados"));
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não encontrado no Banco de Dados"));
 
         clienteDeletado.setDataExclusao(LocalDateTime.now());
         clienteDeletado.setDataAtualizacao(LocalDateTime.now());
@@ -61,19 +65,44 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente buscarCliente(Long id) {
+    public Cliente buscarClienteNaoExcluido(Long id) {
         return repository.findByIdAndDataExclusaoIsNull(id)
-                .orElseThrow(() -> new ErroClienteService("Cliente não encontrado no Banco de Dados"));
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não encontrado no Banco de Dados"));
     }
 
     @Override
-    public List<ClienteDTOView> buscarTodosOsClientes() {
+    public Cliente buscarCliente(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não encontrado no Banco de Dados"));
+    }
+
+    @Override
+    public List<ClienteDTOView> buscarTodosOsClientesNaoExcluidos() {
         List<Cliente> clientes = repository.findAllWhereDataExclusaoIsNull();
         List<ClienteDTOView> clienteDTOS = new ArrayList<>();
 
         clientes.forEach(cliente -> {
             clienteDTOS.add(mapper.toDto(cliente));
         });
+
+        if(clienteDTOS.isEmpty()){
+            throw new ElementoNaoEncontradoException("Nenhum Cliente encontrado no Banco de Dados");
+        }
+        return clienteDTOS;
+    }
+
+    @Override
+    public List<ClienteDTOView> buscarTodosOsClientes() {
+        List<Cliente> clientes = repository.findAll();
+        List<ClienteDTOView> clienteDTOS = new ArrayList<>();
+
+        clientes.forEach(cliente -> {
+            clienteDTOS.add(mapper.toDto(cliente));
+        });
+
+        if(clienteDTOS.isEmpty()){
+            throw new ElementoNaoEncontradoException("Nenhum Cliente encontrado no Banco de Dados");
+        }
 
         return clienteDTOS;
     }
@@ -83,8 +112,16 @@ public class ClienteServiceImpl implements ClienteService {
         boolean existe = repository.existsByNoClienteAndDataExclusaoIsNull(noCliente);
 
         if(existe){
-            throw new ErroClienteService("Cliente com o mesmo nome já existe no Banco de Dados");
+            throw new RegraNegocioException("Cliente com o mesmo nome já existe no Banco de Dados");
         }
+    }
 
+    @Override
+    public void validarDelecaoCliente(Long idCliente) {
+        List<ComandaDTOView> comandasDoCliente = comandaService.buscarComandasAbertasPorCliente(idCliente);
+
+        if(!comandasDoCliente.isEmpty()){
+            throw new RegraNegocioException("Erro ao excluir. Cliente possui comanda aberta ou pendente");
+        }
     }
 }

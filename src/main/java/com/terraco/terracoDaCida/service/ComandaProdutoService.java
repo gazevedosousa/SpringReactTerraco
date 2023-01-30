@@ -12,7 +12,6 @@ public interface ComandaProdutoService {
     ComandaProdutoDTOView deletar(ComandaProduto comandaProduto);
     ComandaProduto buscarComandaProduto(Long id);
     List<ComandaProdutoDTOView> buscarProdutosDeUmaComanda(Long idComanda);
-
     void verificaSituacaoComanda (Comanda comanda);
 
 }

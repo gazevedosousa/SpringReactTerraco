@@ -2,7 +2,7 @@ package com.terraco.terracoDaCida.service;
 
 import com.terraco.terracoDaCida.api.dto.TipoProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.TipoProdutoDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroTipoProdutoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.TipoProdutoMapper;
 import com.terraco.terracoDaCida.model.entity.TipoProduto;
 import com.terraco.terracoDaCida.model.repository.TipoProdutoRepository;
@@ -45,7 +45,7 @@ public class TipoProdutoServiceTest {
         //validação
         service.validarTipoProduto("TipoProduto");
     }
-    @Test(expected = ErroTipoProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void deveLancarErroAoValidar(){
         //cenário
         Mockito.when(repository.existsByNoTipoProdutoAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(true);
@@ -68,10 +68,10 @@ public class TipoProdutoServiceTest {
 
     }
 
-    @Test(expected = ErroTipoProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveCriarTipoProduto(){
         //cenário
-        Mockito.doThrow(ErroTipoProdutoService.class).when(service).validarTipoProduto(Mockito.anyString());
+        Mockito.doThrow(ElementoNaoEncontradoException.class).when(service).validarTipoProduto(Mockito.anyString());
         TipoProduto tipoProduto = criaTipoProduto();
         //ação
         service.criar(tipoProduto);
@@ -90,7 +90,7 @@ public class TipoProdutoServiceTest {
         Mockito.verify(repository, Mockito.times(1)).save(tipoProduto);
     }
 
-    @Test(expected = ErroTipoProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveDeletarTipoProduto() {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
@@ -106,7 +106,7 @@ public class TipoProdutoServiceTest {
         TipoProduto tipoProduto = criaTipoProduto();
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(tipoProduto));
         //ação
-        TipoProduto tipoProdutoEncontrado = service.buscarTipoProduto(Mockito.anyLong());
+        TipoProduto tipoProdutoEncontrado = service.buscarTipoProdutoNaoExcluido(Mockito.anyLong());
         //verificação
         Assertions.assertNotNull(tipoProdutoEncontrado);
     }
@@ -116,8 +116,8 @@ public class TipoProdutoServiceTest {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        ErroTipoProdutoService erroTipoProdutoService = Assertions.assertThrows(ErroTipoProdutoService.class,
-                () -> service.buscarTipoProduto(Mockito.anyLong()));
+        ElementoNaoEncontradoException erroTipoProdutoService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
+                () -> service.buscarTipoProdutoNaoExcluido(Mockito.anyLong()));
         //verificação
         Assertions.assertEquals("Tipo de Produto não encontrado na Base de Dados", erroTipoProdutoService.getMessage());
     }
@@ -127,7 +127,7 @@ public class TipoProdutoServiceTest {
         //cenário
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(List.of(new TipoProduto()));
         //ação
-        List<TipoProdutoDTOView> tipoProdutoEncontrados = service.buscarTodosOsTiposProduto();
+        List<TipoProdutoDTOView> tipoProdutoEncontrados = service.buscarTodosOsTiposProdutoNaoExcluidos();
         //verificação
         Assertions.assertNotNull(tipoProdutoEncontrados);
     }
@@ -137,7 +137,7 @@ public class TipoProdutoServiceTest {
         //cenário
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(Collections.emptyList());
         //ação
-        List<TipoProdutoDTOView> tipoProdutoEncontrados = service.buscarTodosOsTiposProduto();
+        List<TipoProdutoDTOView> tipoProdutoEncontrados = service.buscarTodosOsTiposProdutoNaoExcluidos();
         //verificação
         Assertions.assertTrue(tipoProdutoEncontrados.isEmpty());
     }

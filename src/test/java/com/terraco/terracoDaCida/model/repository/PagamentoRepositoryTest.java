@@ -3,7 +3,7 @@ package com.terraco.terracoDaCida.model.repository;
 import com.terraco.terracoDaCida.api.dto.ClienteDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaDTO;
 import com.terraco.terracoDaCida.api.dto.PagamentoDTO;
-import com.terraco.terracoDaCida.exceptions.ErroPagamentoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.mapper.PagamentoMapper;
@@ -72,16 +72,16 @@ public class PagamentoRepositoryTest {
         Pagamento pagamentoPersistido = entityManager.persist(criaPagamento(comandaPersistida.getId()));
         //ação
         Pagamento pagamentoDoBanco = repository.findByIdAndDataExclusaoIsNull(pagamentoPersistido.getId())
-                .orElseThrow(() -> new ErroPagamentoService("Pagamento não Encontrado") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Pagamento não Encontrado") );
         //verificação
         Assertions.assertNotNull(pagamentoDoBanco);
     }
 
-    @Test(expected = ErroPagamentoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void deveRetornarErroAoNaoAcharPagamentoComBaseNoId(){
         //verificação
         Pagamento pagamentoDoBanco = repository.findByIdAndDataExclusaoIsNull(1L)
-                .orElseThrow(() -> new ErroPagamentoService("Pagamento não Encontrado") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Pagamento não Encontrado") );
     }
 
     private Cliente criaCliente(){

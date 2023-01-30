@@ -1,12 +1,8 @@
 package com.terraco.terracoDaCida.service.impl;
 
-import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTOView;
-import com.terraco.terracoDaCida.api.dto.ProdutoDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroComandaProdutoService;
-import com.terraco.terracoDaCida.exceptions.ErroComandaService;
-import com.terraco.terracoDaCida.exceptions.ErroPagamentoService;
-import com.terraco.terracoDaCida.mapper.ClienteMapper;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
+import com.terraco.terracoDaCida.exceptions.RegraNegocioException;
 import com.terraco.terracoDaCida.mapper.ComandaProdutoMapper;
 import com.terraco.terracoDaCida.model.entity.Comanda;
 import com.terraco.terracoDaCida.model.entity.ComandaProduto;
@@ -20,8 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -43,8 +37,9 @@ public class ComandaProdutoServiceImpl implements ComandaProdutoService {
     @Override
     @Transactional
     public ComandaProdutoDTOView deletar(ComandaProduto comandaProduto) {
+        verificaSituacaoComanda(comandaProduto.getComanda());
         ComandaProduto comandaProdutoBanco = repository.findByIdAndDataExclusaoIsNull(comandaProduto.getId())
-                .orElseThrow(() -> new ErroComandaProdutoService("Lançamento não encontrado"));
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Lançamento não encontrado no Banco de Dados"));
         comandaProdutoBanco.setDataExclusao(LocalDateTime.now());
         comandaProdutoBanco.setDataAtualizacao(LocalDateTime.now());
         return mapper.toDto(repository.save(comandaProdutoBanco));
@@ -53,7 +48,7 @@ public class ComandaProdutoServiceImpl implements ComandaProdutoService {
     @Override
     public ComandaProduto buscarComandaProduto(Long id) {
         return repository.findByIdAndDataExclusaoIsNull(id)
-                .orElseThrow(() -> new ErroComandaProdutoService("Lançamento não encontrado"));
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Lançamento não encontrado no Banco de Dados"));
     }
 
     @Override
@@ -63,13 +58,17 @@ public class ComandaProdutoServiceImpl implements ComandaProdutoService {
         comandaProdutos.forEach(comandaProduto -> {
             comandaProdutoDTOViews.add(mapper.toDto(comandaProduto));
         });
+
+        if(comandaProdutoDTOViews.isEmpty()){
+            throw new ElementoNaoEncontradoException("Nenhum Lançamento encontrado no Banco de Dados");
+        }
         return comandaProdutoDTOViews;
     }
 
     @Override
     public void verificaSituacaoComanda(Comanda comanda) {
-        if(comanda.getSituacaoComanda().equals(SituacaoComandaEnum.PAGA) || comanda.getSituacaoComanda().equals(SituacaoComandaEnum.PENDENTE)){
-            throw new ErroComandaProdutoService("Não é possível lançar produto. Comanda " + comanda.getSituacaoComanda() + ".");
+        if(comanda.getSituacaoComanda().equals(SituacaoComandaEnum.PAGA)){
+            throw new RegraNegocioException("Não é realizar operação. Comanda já paga.");
         }
     }
 }

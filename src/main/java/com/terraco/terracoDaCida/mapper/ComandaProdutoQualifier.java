@@ -5,7 +5,6 @@ import com.terraco.terracoDaCida.model.entity.Produto;
 import com.terraco.terracoDaCida.service.ComandaService;
 import com.terraco.terracoDaCida.service.ProdutoService;
 import org.mapstruct.Mapper;
-import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,5 +51,7 @@ public class ComandaProdutoQualifier {
     public BigDecimal vrProdutoEntityToDTO(Produto produto){
         return produto.getVrProduto();
     }
-
+    public BigDecimal vrComandaProdutoEntityToDTO(Produto produto){
+        return produto.getVrProduto();
+    }
 }

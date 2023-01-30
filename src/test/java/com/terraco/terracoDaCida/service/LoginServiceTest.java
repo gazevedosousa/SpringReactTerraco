@@ -2,7 +2,7 @@ package com.terraco.terracoDaCida.service;
 
 import com.terraco.terracoDaCida.api.dto.LoginDTO;
 import com.terraco.terracoDaCida.api.dto.LoginDTOView;
-import com.terraco.terracoDaCida.exceptions.ErroLoginService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.LoginMapper;
 import com.terraco.terracoDaCida.model.entity.Login;
 import com.terraco.terracoDaCida.model.repository.LoginRepository;
@@ -46,7 +46,7 @@ public class LoginServiceTest {
         //validação
         service.validarLogin("Login");
     }
-    @Test(expected = ErroLoginService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void deveLancarErroAoValidar(){
         //cenário
         Mockito.when(repository.existsByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(true);
@@ -73,7 +73,7 @@ public class LoginServiceTest {
         String coSenha = "senha";
         Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.empty());
         //ação
-        ErroLoginService erroLoginService = Assertions.assertThrows(ErroLoginService.class,
+        ElementoNaoEncontradoException erroLoginService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.autenticar(noUsuario, coSenha));
         //verificação
         Assertions.assertEquals("Usuário não encontrado na base de dados", erroLoginService.getMessage());
@@ -87,7 +87,7 @@ public class LoginServiceTest {
         String coSenha = "senhaErrada";
         Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.of(login));
         //ação
-        ErroLoginService erroLoginService = Assertions.assertThrows(ErroLoginService.class,
+        ElementoNaoEncontradoException erroLoginService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.autenticar(noUsuario, coSenha));
         //verificação
         Assertions.assertEquals("Senha inválida", erroLoginService.getMessage());
@@ -109,10 +109,10 @@ public class LoginServiceTest {
 
     }
 
-    @Test(expected = ErroLoginService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveCriarLogin(){
         //cenário
-        Mockito.doThrow(ErroLoginService.class).when(service).validarLogin(Mockito.anyString());
+        Mockito.doThrow(ElementoNaoEncontradoException.class).when(service).validarLogin(Mockito.anyString());
         Login login = criaLogin();
         //ação
         service.criarLogin(login);
@@ -132,7 +132,7 @@ public class LoginServiceTest {
         Mockito.verify(repository, Mockito.times(1)).save(login);
     }
 
-    @Test(expected = ErroLoginService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveAlterarLogin() throws NoSuchAlgorithmException {
         //cenário
         Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.empty());
@@ -153,7 +153,7 @@ public class LoginServiceTest {
         Mockito.verify(repository, Mockito.times(1)).save(login);
     }
 
-    @Test(expected = ErroLoginService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveDeletarLogin() {
         //cenário
         Mockito.when(repository.findByNoUsuarioAndDataExclusaoIsNull(Mockito.anyString())).thenReturn(Optional.empty());
@@ -179,7 +179,7 @@ public class LoginServiceTest {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        ErroLoginService erroLoginService = Assertions.assertThrows(ErroLoginService.class,
+        ElementoNaoEncontradoException erroLoginService = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.buscarLogin(Mockito.anyLong()));
         //verificação
         Assertions.assertEquals("Usuário não encontrado na base de dados", erroLoginService.getMessage());

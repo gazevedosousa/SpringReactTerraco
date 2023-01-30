@@ -5,15 +5,18 @@ import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTOView;
 import com.terraco.terracoDaCida.model.entity.Comanda;
 import com.terraco.terracoDaCida.model.entity.ComandaProduto;
 import com.terraco.terracoDaCida.model.entity.Produto;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-import java.math.BigDecimal;
-
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ComandaProdutoQualifier.class)
+
 public interface ComandaProdutoMapper {
 
     ComandaProdutoMapper INSTANCE = Mappers.getMapper(ComandaProdutoMapper.class);
@@ -50,23 +53,27 @@ public interface ComandaProdutoMapper {
                 .noProdutoEntityToDTO(produto);
     }
 
-    @Named("vrProdutoEntityToDTO")
-    default BigDecimal vrProdutoEntityToDTO(Produto produto){
-        return ComandaProdutoQualifier.getFirstInstance()
-                .vrProdutoEntityToDTO(produto);
-    }
-
-
 
     @Mapping(source = "comanda", target = "idComanda", qualifiedByName = "comandaEntityToDTO")
     @Mapping(source = "comanda", target = "noCliente", qualifiedByName = "noClienteEntityToDTO")
     @Mapping(source = "produto", target = "idProduto", qualifiedByName = "produtoEntityToDTO")
     @Mapping(source = "produto", target = "noProduto", qualifiedByName = "noProdutoEntityToDTO")
-    @Mapping(source = "produto", target = "vrProduto", qualifiedByName = "vrProdutoEntityToDTO")
+    @Mapping(source = "vrComandaProduto", target = "vrProduto")
     ComandaProdutoDTOView toDto(ComandaProduto comandaProduto);
 
     @Mapping(source = "idComanda", target = "comanda", qualifiedByName = "comandaDtoToEntity")
     @Mapping(source = "idProduto", target = "produto", qualifiedByName = "produtoDtoToEntity")
+    @BeanMapping(builder = @Builder(disableBuilder = true))
     ComandaProduto toEntity(ComandaProdutoDTO dto);
+
+    @Mapping(source = "idComanda", target = "comanda", qualifiedByName = "comandaDtoToEntity")
+    @Mapping(source = "idProduto", target = "produto", qualifiedByName = "produtoDtoToEntity")
+    @Mapping(source = "vrProduto", target = "vrComandaProduto")
+    ComandaProduto viewToEntity(ComandaProdutoDTOView dto);
+
+    @AfterMapping
+    default void incluiVrComandaProduto(ComandaProdutoDTO dto, @MappingTarget ComandaProduto comandaProduto){
+        comandaProduto.setVrComandaProduto(comandaProduto.getProduto().getVrProduto());
+    }
 
 }

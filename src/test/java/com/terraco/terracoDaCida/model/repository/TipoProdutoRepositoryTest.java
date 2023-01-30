@@ -1,7 +1,7 @@
 package com.terraco.terracoDaCida.model.repository;
 
 import com.terraco.terracoDaCida.api.dto.TipoProdutoDTO;
-import com.terraco.terracoDaCida.exceptions.ErroTipoProdutoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.TipoProdutoMapper;
 import com.terraco.terracoDaCida.model.entity.TipoProduto;
 import org.junit.Test;
@@ -79,16 +79,16 @@ public class TipoProdutoRepositoryTest {
         TipoProduto tipoProduto = entityManager.persist(criaTipoProduto());
         //ação
         TipoProduto tipoProdutoDoBanco = repository.findByIdAndDataExclusaoIsNull(tipoProduto.getId())
-                .orElseThrow(() -> new ErroTipoProdutoService("Tipo de Produto não Encontrado") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Tipo de Produto não Encontrado") );
         //verificação
         Assertions.assertNotNull(tipoProdutoDoBanco);
     }
 
-    @Test(expected = ErroTipoProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void deveRetornarErroAoNaoAcharTipoDeProdutoComBaseNoId(){
         //verificação
         TipoProduto tipoProdutoDoBanco = repository.findByIdAndDataExclusaoIsNull(1L)
-                .orElseThrow(() -> new ErroTipoProdutoService("Tipo de Produto não Encontrado") );
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Tipo de Produto não Encontrado") );
     }
 
 

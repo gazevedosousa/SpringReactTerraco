@@ -6,7 +6,7 @@ import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTOView;
 import com.terraco.terracoDaCida.api.dto.ProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.TipoProdutoDTO;
-import com.terraco.terracoDaCida.exceptions.ErroComandaProdutoService;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ClienteMapper;
 import com.terraco.terracoDaCida.mapper.ComandaMapper;
 import com.terraco.terracoDaCida.mapper.ComandaProdutoMapper;
@@ -83,21 +83,6 @@ public class ComandaProdutoServiceTest {
         service.verificaSituacaoComanda(comanda);
     }
     @Test
-    public void deveLancarErroAoValidarSituacaoComandaPorComandaPendente(){
-        //cenário
-        Mockito.when(comandaRepository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(new Comanda()));
-        Mockito.when(clienteRepository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(new Cliente()));
-        Cliente cliente = criaCliente();
-        Comanda comanda = criaComanda(cliente.getId());
-        comanda.setSituacaoComanda(SituacaoComandaEnum.PENDENTE);
-        //ação
-        ErroComandaProdutoService erroComandaProdutoService = Assertions.assertThrows(ErroComandaProdutoService.class,
-                () -> service.verificaSituacaoComanda(comanda));
-        //validação
-        Assertions.assertEquals("Não é possível lançar produto. Comanda PENDENTE.", erroComandaProdutoService.getMessage());
-    }
-
-    @Test
     public void deveLancarErroAoValidarSituacaoComandaPorComandaPaga(){
         //cenário
         Mockito.when(comandaRepository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(new Comanda()));
@@ -106,10 +91,10 @@ public class ComandaProdutoServiceTest {
         Comanda comanda = criaComanda(cliente.getId());
         comanda.setSituacaoComanda(SituacaoComandaEnum.PAGA);
         //ação
-        ErroComandaProdutoService erroComandaProdutoService = Assertions.assertThrows(ErroComandaProdutoService.class,
+        ElementoNaoEncontradoException elementoNaoEncontrado = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.verificaSituacaoComanda(comanda));
         //validação
-        Assertions.assertEquals("Não é possível lançar produto. Comanda PAGA.", erroComandaProdutoService.getMessage());
+        Assertions.assertEquals("Não é possível lançar produto. Comanda PAGA.", elementoNaoEncontrado.getMessage());
     }
 
     @Test(expected = Test.None.class)
@@ -127,11 +112,11 @@ public class ComandaProdutoServiceTest {
 
     }
 
-    @Test(expected = ErroComandaProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveCriarComandaProduto(){
         //cenário
         ComandaProduto comandaProduto = criaCenario();
-        Mockito.doThrow(ErroComandaProdutoService.class).when(service).verificaSituacaoComanda(comandaProduto.getComanda());
+        Mockito.doThrow(ElementoNaoEncontradoException.class).when(service).verificaSituacaoComanda(comandaProduto.getComanda());
         //ação
         service.criar(comandaProduto);
         //verificação
@@ -149,7 +134,7 @@ public class ComandaProdutoServiceTest {
         Mockito.verify(repository, Mockito.times(1)).save(comandaProduto);
     }
 
-    @Test(expected = ErroComandaProdutoService.class)
+    @Test(expected = ElementoNaoEncontradoException.class)
     public void naoDeveDeletarComandaProduto() {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
@@ -175,7 +160,7 @@ public class ComandaProdutoServiceTest {
         //cenário
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
-        ErroComandaProdutoService erroComandaProduto = Assertions.assertThrows(ErroComandaProdutoService.class,
+        ElementoNaoEncontradoException erroComandaProduto = Assertions.assertThrows(ElementoNaoEncontradoException.class,
                 () -> service.buscarComandaProduto(Mockito.anyLong()));
         //verificação
         Assertions.assertEquals("Lançamento não encontrado", erroComandaProduto.getMessage());
@@ -285,7 +270,6 @@ public class ComandaProdutoServiceTest {
 
         return produtoMapeado;
     }
-
 
 
 }
