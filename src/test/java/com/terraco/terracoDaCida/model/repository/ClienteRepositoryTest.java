@@ -74,11 +74,44 @@ public class ClienteRepositoryTest {
     }
 
     @Test
-    public void deveRetornarUmUsuarioComBaseNoIdAchadoNoBanco(){
+    public void deveAcharTodosOsClientes(){
+        //cenário
+        Cliente cliente1 = entityManager.persist(criaCliente());
+        Cliente cliente2 = criaCliente();
+        cliente2.setNoCliente("cliente2");
+        entityManager.persist(cliente2);
+        Cliente cliente3 = criaCliente();
+        cliente3.setNoCliente("cliente3");
+        cliente3.setDataExclusao(LocalDateTime.now());
+        entityManager.persist(cliente3);
+
+        List<Cliente> clientes = new ArrayList<>();
+        clientes.add(cliente1);
+        clientes.add(cliente2);
+        clientes.add(cliente3);
+        //ação
+        List<Cliente> clienteList = repository.findAll();
+        //verificação
+        Assertions.assertEquals(clientes, clienteList);
+    }
+
+    @Test
+    public void deveRetornarUmUsuarioNaoExcluidoComBaseNoIdAchadoNoBanco(){
         //cenário
         Cliente clientePersistido = entityManager.persist(criaCliente());
         //ação
         Cliente clienteDoBanco = repository.findByIdAndDataExclusaoIsNull(clientePersistido.getId())
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não Encontrado") );
+        //verificação
+        Assertions.assertNotNull(clienteDoBanco);
+    }
+
+    @Test
+    public void deveRetornarUmUsuarioComBaseNoIdAchadoNoBanco(){
+        //cenário
+        Cliente clientePersistido = entityManager.persist(criaCliente());
+        //ação
+        Cliente clienteDoBanco = repository.findById(clientePersistido.getId())
                 .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não Encontrado") );
         //verificação
         Assertions.assertNotNull(clienteDoBanco);

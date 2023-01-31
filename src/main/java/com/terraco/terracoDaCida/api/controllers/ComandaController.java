@@ -40,21 +40,21 @@ public class ComandaController {
     @GetMapping(value = "/{id}")
     public ResponseEntity buscarComanda(@PathVariable("id") Long id)
     {
-        ComandaDTOView dto = mapper.toDto(service.buscarComandaNaoExcluida(id));
+        ComandaDTOView dto = mapper.toDto(service.buscarComanda(id));
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
     @GetMapping(value = "/todas")
     public ResponseEntity buscarTodasAsComandas()
     {
-        List<ComandaDTOView> comandas = service.buscarTodasAsComandasNaoExcluidas();
+        List<ComandaDTOView> comandas = service.buscarTodasAsComandas();
         return new ResponseEntity(comandas, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/fecharComanda")
     public ResponseEntity fecharComanda(@PathVariable("id") Long id)
     {
-        Comanda comanda = service.buscarComandaNaoExcluida(id);
+        Comanda comanda = service.buscarComanda(id);
         ComandaDTOView comandaFechada = service.fecharComanda(comanda);
         return new ResponseEntity(comandaFechada, HttpStatus.OK);
     }
@@ -62,7 +62,7 @@ public class ComandaController {
     @PutMapping(value = "/{id}/reabrirComanda")
     public ResponseEntity reabrirComanda(@PathVariable("id") Long id)
     {
-        Comanda comanda = service.buscarComandaNaoExcluida(id);
+        Comanda comanda = service.buscarComanda(id);
         ComandaDTOView comandaReaberta = service.reabrirComanda(comanda);
         return new ResponseEntity(comandaReaberta, HttpStatus.OK);
     }
@@ -70,7 +70,7 @@ public class ComandaController {
     @DeleteMapping(value = "/{id}/deletar")
     public ResponseEntity deletar(@PathVariable("id") Long id)
     {
-        Comanda comanda = service.buscarComandaNaoExcluida(id);
+        Comanda comanda = service.buscarComanda(id);
         ComandaDTOView comandaDeletada = service.deletar(comanda);
         return new ResponseEntity(comandaDeletada, HttpStatus.OK);
     }

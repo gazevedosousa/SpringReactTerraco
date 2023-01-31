@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,5 +16,6 @@ public class PagamentoDTOView {
     private Long idComanda;
     private String noCliente;
     private String tipoPagamento;
+    private LocalDate dtPagamento;
     private BigDecimal vrPagamento;
 }

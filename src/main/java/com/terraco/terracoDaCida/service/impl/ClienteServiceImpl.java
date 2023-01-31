@@ -85,9 +85,6 @@ public class ClienteServiceImpl implements ClienteService {
             clienteDTOS.add(mapper.toDto(cliente));
         });
 
-        if(clienteDTOS.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Cliente encontrado no Banco de Dados");
-        }
         return clienteDTOS;
     }
 
@@ -99,10 +96,6 @@ public class ClienteServiceImpl implements ClienteService {
         clientes.forEach(cliente -> {
             clienteDTOS.add(mapper.toDto(cliente));
         });
-
-        if(clienteDTOS.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Cliente encontrado no Banco de Dados");
-        }
 
         return clienteDTOS;
     }

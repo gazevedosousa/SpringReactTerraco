@@ -61,6 +61,30 @@ public class ProdutoRepositoryTest {
     }
 
     @Test
+    public void deveAcharTodosOsProdutosDeUmTipoEspecifico(){
+        //cenário
+        TipoProduto tipoProduto = entityManager.persist(criaTipoProduto());
+        TipoProduto tipoProduto2 = criaTipoProduto();
+        tipoProduto2.setNoTipoProduto("TipoProduto2");
+        entityManager.persist(tipoProduto2);
+        Produto produto1 = entityManager.persist(criaProduto(tipoProduto.getId()));
+        Produto produto2 = criaProduto(tipoProduto.getId());
+        produto2.setNoProduto("Produto2");
+        entityManager.persist(produto2);
+        Produto produto3 = criaProduto(tipoProduto.getId());
+        produto3.setNoProduto("Produto3");
+        produto3.setTipoProduto(tipoProduto2);
+        entityManager.persist(produto3);
+        List<Produto> produtosTipo1 = new ArrayList<>();
+        produtosTipo1.add(produto1);
+        produtosTipo1.add(produto2);
+        //ação
+        List<Produto> produtoList = repository.findAllWhereTipoProdutoAndDataExclusaoIsNull(tipoProduto.getId());
+        //verificação
+        Assertions.assertEquals(produtosTipo1, produtoList);
+    }
+
+    @Test
     public void deveVerificarAExistenciaProdutoComBaseNoNomeDoProduto(){
         //cenário
         TipoProduto tipoProduto = entityManager.persist(criaTipoProduto());

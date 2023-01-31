@@ -61,9 +61,6 @@ public class TipoProdutoServiceImpl implements TipoProdutoService {
             tipoProdutoDTOViews.add(mapper.toDto(tipoProduto));
         });
 
-        if(tipoProdutoDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Tipo de Produto encontrado no Banco de Dados");
-        }
         return tipoProdutoDTOViews;
     }
 
@@ -82,9 +79,6 @@ public class TipoProdutoServiceImpl implements TipoProdutoService {
             tipoProdutoDTOViews.add(mapper.toDto(tipoProduto));
         });
 
-        if(tipoProdutoDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Tipo de Produto encontrado no Banco de Dados");
-        }
         return tipoProdutoDTOViews;
     }
 

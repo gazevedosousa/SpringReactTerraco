@@ -39,7 +39,7 @@ public class ComandaRepositoryTest {
     private ClienteMapper clienteMapper = Mappers.getMapper(ClienteMapper.class);
 
     @Test
-    public void deveAcharTodasAsComandasQueNaoEstaoExcluidas(){
+    public void deveAcharTodasAsComandas(){
         //cenário
         Cliente clientePersistido = entityManager.persist(criaCliente());
         Comanda comanda1 = entityManager.persist(criaComanda(clientePersistido.getId()));
@@ -47,17 +47,35 @@ public class ComandaRepositoryTest {
         Comanda comanda3 = criaComanda(clientePersistido.getId());
         comanda3.setDataExclusao(LocalDateTime.now());
         entityManager.persist(comanda3);
-        List<Comanda> comandasNaoExcluidas = new ArrayList<>();
-        comandasNaoExcluidas.add(comanda1);
-        comandasNaoExcluidas.add(comanda2);
+        List<Comanda> comandas = new ArrayList<>();
+        comandas.add(comanda1);
+        comandas.add(comanda2);
         //ação
         List<Comanda> comandasList = repository.findAllWhereDataExclusaoIsNull();
         //verificação
-        Assertions.assertEquals(comandasNaoExcluidas, comandasList);
+        Assertions.assertEquals(comandas, comandasList);
     }
 
     @Test
-    public void deveAcharUmaComandaQueNaoEstaExcluida(){
+    public void deveAcharListaDeComandasDeCliente(){
+        //cenário
+        Cliente clientePersistido = entityManager.persist(criaCliente());
+        Comanda comanda1 = entityManager.persist(criaComanda(clientePersistido.getId()));
+        Comanda comanda2 = entityManager.persist(criaComanda(clientePersistido.getId()));
+        Comanda comanda3 = criaComanda(clientePersistido.getId());
+        comanda3.setDataExclusao(LocalDateTime.now());
+        entityManager.persist(comanda3);
+        List<Comanda> comandas = new ArrayList<>();
+        comandas.add(comanda1);
+        comandas.add(comanda2);
+        //ação
+        List<Comanda> comandasList = repository.findByIdClienteAndDataExclusaoIsNull(clientePersistido.getId());
+        //verificação
+        Assertions.assertEquals(comandas, comandasList);
+    }
+
+    @Test
+    public void deveAcharUmaComanda(){
         //cenário
         Cliente clientePersistido = entityManager.persist(criaCliente());
         Comanda comandaPersistida = entityManager.persist(criaComanda(clientePersistido.getId()));
@@ -69,7 +87,7 @@ public class ComandaRepositoryTest {
     }
 
     @Test(expected = ElementoNaoEncontradoException.class)
-    public void deveRetornarErroAoNaoAcharComandaComBaseNoIdNaoExcluida(){
+    public void deveRetornarErroAoNaoAcharComandaComBaseNoId(){
         //verificação
         Comanda comanda = repository.findByIdAndDataExclusaoIsNull(1l)
                 .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda não Encontrada") );

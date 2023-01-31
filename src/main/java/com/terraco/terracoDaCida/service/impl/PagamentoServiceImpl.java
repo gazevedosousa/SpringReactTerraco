@@ -68,9 +68,6 @@ public class PagamentoServiceImpl implements PagamentoService {
             pagamentoDTOViews.add(mapper.toDto(pagamento));
         });
 
-        if(pagamentoDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Pagamento encontrado no Banco de Dados");
-        }
         return pagamentoDTOViews;
     }
 

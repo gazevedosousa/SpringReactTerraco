@@ -143,7 +143,7 @@ public class ComandaServiceTest {
         Comanda comanda = criaCenario();
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.of(comanda));
         //ação
-        Comanda comandaEncontrada = service.buscarComandaNaoExcluida(Mockito.anyLong());
+        Comanda comandaEncontrada = service.buscarComanda(Mockito.anyLong());
         //verificação
         Assertions.assertNotNull(comandaEncontrada);
     }
@@ -154,7 +154,7 @@ public class ComandaServiceTest {
         Mockito.when(repository.findByIdAndDataExclusaoIsNull(Mockito.anyLong())).thenReturn(Optional.empty());
         //ação
         ElementoNaoEncontradoException erroComanda = Assertions.assertThrows(ElementoNaoEncontradoException.class,
-                () -> service.buscarComandaNaoExcluida(Mockito.anyLong()));
+                () -> service.buscarComanda(Mockito.anyLong()));
         //verificação
         Assertions.assertEquals("Comanda não encontrada na Base de Dados", erroComanda.getMessage());
     }
@@ -166,7 +166,7 @@ public class ComandaServiceTest {
         Comanda comanda = criaCenario();
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(List.of(comanda));
         //ação
-        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandasNaoExcluidas();
+        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandas();
         //verificação
         Assertions.assertNotNull(comandasEncontradas);
     }
@@ -176,7 +176,7 @@ public class ComandaServiceTest {
         //cenário
         Mockito.when(repository.findAllWhereDataExclusaoIsNull()).thenReturn(Collections.emptyList());
         //ação
-        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandasNaoExcluidas();
+        List<ComandaDTOView> comandasEncontradas = service.buscarTodasAsComandas();
         //verificação
         Assertions.assertTrue(comandasEncontradas.isEmpty());
     }

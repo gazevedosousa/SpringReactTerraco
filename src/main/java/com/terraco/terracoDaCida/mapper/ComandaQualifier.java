@@ -32,7 +32,7 @@ public class ComandaQualifier {
     }
 
     public Cliente dtoToEntity(Long id){
-        return clienteService.buscarClienteNaoExcluido(id);
+        return clienteService.buscarCliente(id);
     }
     public String entityToDTO(Cliente cliente){
         return cliente.getNoCliente();

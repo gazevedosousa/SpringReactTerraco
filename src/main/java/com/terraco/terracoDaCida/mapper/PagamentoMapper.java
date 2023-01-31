@@ -34,6 +34,7 @@ public interface PagamentoMapper {
 
     @Mapping(source = "comanda", target = "noCliente", qualifiedByName = "entityToDTOCliente")
     @Mapping(source = "comanda", target = "idComanda", qualifiedByName = "entityToDTO")
+    @Mapping(source = "dataCriacao", target = "dtPagamento")
     PagamentoDTOView toDto(Pagamento pagamento);
 
     @Mapping(source = "idComanda", target = "comanda", qualifiedByName = "dtoToEntity")

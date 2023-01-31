@@ -68,9 +68,6 @@ public class ProdutoServiceImpl implements ProdutoService {
             produtoDTOViews.add(mapper.toDto(produto));
         });
 
-        if(produtoDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Produto encontrado no Banco de Dados");
-        }
         return produtoDTOViews;
     }
 
@@ -89,9 +86,6 @@ public class ProdutoServiceImpl implements ProdutoService {
             produtoDTOViews.add(mapper.toDto(produto));
         });
 
-        if(produtoDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Produto encontrado no Banco de Dados");
-        }
         return produtoDTOViews;
     }
 
@@ -104,9 +98,6 @@ public class ProdutoServiceImpl implements ProdutoService {
             produtoDTOViews.add(mapper.toDto(produto));
         });
 
-        if(produtoDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Produto encontrado no Banco de Dados");
-        }
         return produtoDTOViews;
     }
 

@@ -59,9 +59,6 @@ public class ComandaProdutoServiceImpl implements ComandaProdutoService {
             comandaProdutoDTOViews.add(mapper.toDto(comandaProduto));
         });
 
-        if(comandaProdutoDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Lançamento encontrado no Banco de Dados");
-        }
         return comandaProdutoDTOViews;
     }
 

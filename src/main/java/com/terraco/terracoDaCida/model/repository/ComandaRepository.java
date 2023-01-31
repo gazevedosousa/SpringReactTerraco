@@ -12,7 +12,5 @@ public interface ComandaRepository extends JpaRepository<Comanda, Long> {
     List<Comanda> findAllWhereDataExclusaoIsNull();
     @Query("Select c from Comanda c join c.cliente cl where cl.id = :idCliente and c.dataExclusao is null")
     List<Comanda> findByIdClienteAndDataExclusaoIsNull(Long idCliente);
-    @Query("Select c from Comanda c join c.cliente cl where cl.id = :idCliente")
-    List<Comanda> findByIdCliente(Long idCliente);
     Optional<Comanda> findByIdAndDataExclusaoIsNull(Long idComanda);
 }

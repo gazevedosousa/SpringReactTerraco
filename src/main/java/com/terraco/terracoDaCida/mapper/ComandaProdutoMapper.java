@@ -59,6 +59,7 @@ public interface ComandaProdutoMapper {
     @Mapping(source = "produto", target = "idProduto", qualifiedByName = "produtoEntityToDTO")
     @Mapping(source = "produto", target = "noProduto", qualifiedByName = "noProdutoEntityToDTO")
     @Mapping(source = "vrComandaProduto", target = "vrProduto")
+    @Mapping(source = "dataCriacao", target = "dtLancamento")
     ComandaProdutoDTOView toDto(ComandaProduto comandaProduto);
 
     @Mapping(source = "idComanda", target = "comanda", qualifiedByName = "comandaDtoToEntity")

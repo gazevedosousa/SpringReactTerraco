@@ -11,9 +11,7 @@ public interface ComandaService {
     ComandaDTOView deletar(Comanda comanda);
     ComandaDTOView fecharComanda(Comanda comanda);
     ComandaDTOView reabrirComanda(Comanda comanda);
-    Comanda buscarComandaNaoExcluida(Long id);
     Comanda buscarComanda(Long id);
-    List<ComandaDTOView> buscarTodasAsComandasNaoExcluidas();
     List<ComandaDTOView> buscarTodasAsComandas();
     List<ComandaDTOView> buscarComandasPorCliente(Long idCliente);
     List<ComandaDTOView> buscarComandasAbertasPorCliente(Long idCliente);

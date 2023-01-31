@@ -87,10 +87,6 @@ public class LoginServiceImpl implements LoginService {
             loginDTOViews.add(mapper.toDto(login));
         });
 
-        if(loginDTOViews.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhum Login encontrado no Banco de Dados");
-        }
-
         return loginDTOViews;
     }
 

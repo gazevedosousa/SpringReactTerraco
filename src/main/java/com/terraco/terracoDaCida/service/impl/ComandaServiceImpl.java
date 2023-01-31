@@ -10,7 +10,6 @@ import com.terraco.terracoDaCida.mapper.ComandaProdutoMapper;
 import com.terraco.terracoDaCida.mapper.PagamentoMapper;
 import com.terraco.terracoDaCida.model.entity.Comanda;
 import com.terraco.terracoDaCida.model.enums.SituacaoComandaEnum;
-import com.terraco.terracoDaCida.model.repository.ClienteRepository;
 import com.terraco.terracoDaCida.model.repository.ComandaRepository;
 import com.terraco.terracoDaCida.service.ComandaProdutoService;
 import com.terraco.terracoDaCida.service.ComandaService;
@@ -28,7 +27,6 @@ import java.util.List;
 public class ComandaServiceImpl implements ComandaService {
 
     private final ComandaRepository repository;
-    private final ClienteRepository clienteRepository;
     private final PagamentoService pagamentoService;
     private final ComandaProdutoService comandaProdutoService;
     private final ComandaMapper mapper = ComandaMapper.INSTANCE;
@@ -96,45 +94,20 @@ public class ComandaServiceImpl implements ComandaService {
     }
 
     @Override
-    public Comanda buscarComandaNaoExcluida(Long id) {
+    public Comanda buscarComanda(Long id) {
         return repository.findByIdAndDataExclusaoIsNull(id)
                 .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda não encontrada no Banco de Dados"));
     }
 
-    @Override
-    public Comanda buscarComanda(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda não encontrada no Banco de Dados"));
-    }
 
     @Override
-    public List<ComandaDTOView> buscarTodasAsComandasNaoExcluidas() {
+    public List<ComandaDTOView> buscarTodasAsComandas() {
         List<Comanda> comandas = repository.findAllWhereDataExclusaoIsNull();
         List<ComandaDTOView> comandaDtoView = new ArrayList<>();
 
         comandas.forEach(comanda -> {
             comandaDtoView.add(mapper.toDto(comanda));
         });
-
-        if(comandaDtoView.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhuma Comanda encontrada no Banco de Dados");
-        }
-
-        return comandaDtoView;
-    }
-
-    @Override
-    public List<ComandaDTOView> buscarTodasAsComandas() {
-        List<Comanda> comandas = repository.findAll();
-        List<ComandaDTOView> comandaDtoView = new ArrayList<>();
-
-        comandas.forEach(comanda -> {
-            comandaDtoView.add(mapper.toDto(comanda));
-        });
-
-        if(comandaDtoView.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhuma Comanda encontrada no Banco de Dados");
-        }
 
         return comandaDtoView;
     }
@@ -147,10 +120,6 @@ public class ComandaServiceImpl implements ComandaService {
         comandas.forEach(comanda -> {
             comandaDtoView.add(mapper.toDto(comanda));
         });
-
-        if(comandaDtoView.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhuma Comanda encontrada para esse cliente no Banco de Dados");
-        }
 
         return comandaDtoView;
     }
@@ -165,10 +134,6 @@ public class ComandaServiceImpl implements ComandaService {
                 comandaDtoView.add(mapper.toDto(comanda));
             }
         });
-
-        if(comandaDtoView.isEmpty()){
-            throw new ElementoNaoEncontradoException("Nenhuma Comanda Aberta encontrada para esse cliente no Banco de Dados");
-        }
 
         return comandaDtoView;
     }

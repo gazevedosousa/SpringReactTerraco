@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/pagamento")
 @JsonDeserialize
@@ -45,6 +47,17 @@ public class PagamentoController {
     {
         try{
             PagamentoDTOView dto = mapper.toDto(service.buscarPagamento(id));
+            return new ResponseEntity(dto, HttpStatus.OK);
+        }catch (ElementoNaoEncontradoException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/comanda/{idComanda}")
+    public ResponseEntity buscarPagamentoDeUmaComanda(@PathVariable("idComanda") Long id)
+    {
+        try{
+            List<PagamentoDTOView> dto = service.buscarPagamentosDeUmaComanda(id);
             return new ResponseEntity(dto, HttpStatus.OK);
         }catch (ElementoNaoEncontradoException e){
             return ResponseEntity.badRequest().body(e.getMessage());

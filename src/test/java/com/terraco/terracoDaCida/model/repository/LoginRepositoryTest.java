@@ -54,7 +54,7 @@ public class LoginRepositoryTest {
     }
 
     @Test
-    public void deveAcharTodosOsLoginsQueNaoEstaoExcluidos(){
+    public void deveAcharTodosOsLogins(){
         //cenário
         Login login1 = entityManager.persist(criaLogin());
         Login login2 = criaLogin();
@@ -113,7 +113,7 @@ public class LoginRepositoryTest {
     private Login criaLogin(){
         LoginDTO dto =LoginDTO.builder()
             .noUsuario("User")
-            .perfil("USER")
+            .perfil("USUARIO")
             .coSenha("senha")
             .build();
 
