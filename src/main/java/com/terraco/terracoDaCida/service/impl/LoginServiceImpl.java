@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -36,10 +37,16 @@ public class LoginServiceImpl implements LoginService {
         }
 
         if(!Arrays.equals(login.get().getCoSenha(), CriptografiaUtil.criptografar(coSenha))){
-            throw new ElementoNaoEncontradoException("Senha inválida");
+            throw new RegraNegocioException("Senha inválida");
         }
 
         return login.get();
+    }
+
+    @Override
+    public Login retornaUsuarioAutenticado(UUID uuid) {
+        return repository.findByToken(uuid)
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Token não encontrado no Banco de Dados"));
     }
 
     @Override

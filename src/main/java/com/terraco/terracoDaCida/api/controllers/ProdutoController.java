@@ -55,7 +55,7 @@ public class ProdutoController {
     public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody ProdutoDTO dto)
     {
         Produto produto = service.buscarProdutoNaoExcluido(id);
-        ProdutoDTOView produtoAtualizado = service.atualizar(produto, dto.getVrProduto());
+        ProdutoDTOView produtoAtualizado = service.atualizar(produto, dto.getVrProduto(), dto.getIdTipoProduto());
         return new ResponseEntity(produtoAtualizado, HttpStatus.OK);
     }
 

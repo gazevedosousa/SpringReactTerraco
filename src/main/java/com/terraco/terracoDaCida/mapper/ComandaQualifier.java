@@ -1,9 +1,12 @@
 package com.terraco.terracoDaCida.mapper;
 
 import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTOView;
+import com.terraco.terracoDaCida.api.dto.PagamentoDTOView;
 import com.terraco.terracoDaCida.model.entity.Cliente;
+import com.terraco.terracoDaCida.model.entity.Comanda;
 import com.terraco.terracoDaCida.service.ClienteService;
 import com.terraco.terracoDaCida.service.ComandaProdutoService;
+import com.terraco.terracoDaCida.service.PagamentoService;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +21,8 @@ public class ComandaQualifier {
     private ClienteService clienteService;
     @Autowired
     private ComandaProdutoService comandaProdutoService;
+    @Autowired
+    private PagamentoService pagamentoService;
 
     static protected ComandaQualifier FIRST_INSTANCE;
 
@@ -40,10 +45,26 @@ public class ComandaQualifier {
 
     public BigDecimal entityToDTOValorComanda(Long idComanda){
         List<ComandaProdutoDTOView> comandaProdutoDTOViews = comandaProdutoService.buscarProdutosDeUmaComanda(idComanda);
-
-        return comandaProdutoDTOViews
+        List<PagamentoDTOView> pagamentoDTOViews = pagamentoService.buscarPagamentosDeUmaComanda(idComanda);
+        BigDecimal lancamentos = comandaProdutoDTOViews
+                        .stream()
+                        .map(ComandaProdutoDTOView::getVrTotal)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal pagamentos = pagamentoDTOViews
                 .stream()
-                .map(ComandaProdutoDTOView::getVrProduto)
+                .map(PagamentoDTOView::getVrPagamento)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal resultado =  lancamentos.subtract(pagamentos);
+
+        if(resultado.compareTo(BigDecimal.ZERO) > 0){
+            return resultado;
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    public Cliente dtoViewToEntity(String noCliente){
+        return clienteService.buscarClientePorNome(noCliente);
     }
 }

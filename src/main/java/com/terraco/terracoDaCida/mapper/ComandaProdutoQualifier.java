@@ -48,10 +48,4 @@ public class ComandaProdutoQualifier {
     public String noProdutoEntityToDTO(Produto produto){
         return String.valueOf(produto.getNoProduto());
     }
-    public BigDecimal vrProdutoEntityToDTO(Produto produto){
-        return produto.getVrProduto();
-    }
-    public BigDecimal vrComandaProdutoEntityToDTO(Produto produto){
-        return produto.getVrProduto();
-    }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PagamentoRepository extends JpaRepository<Pagamento, Long> {
-    @Query("Select p from Pagamento p join p.comanda c where c.id = :idComanda and p.dataExclusao is null")
+    @Query("Select p from Pagamento p join p.comanda c where c.id = :idComanda and p.dataExclusao is null order by p.dataCriacao desc")
     List<Pagamento> findByComandaIdAndDataExclusaoIsNull(Long idComanda);
     Optional<Pagamento> findByIdAndDataExclusaoIsNull(Long id);
 }

@@ -11,6 +11,7 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name="login")
@@ -32,6 +33,9 @@ public class Login {
 
     @Column(nullable = false)
     private PerfilEnum perfil;
+
+    @Column(nullable = false)
+    private UUID token;
 
     @Column(nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)

@@ -6,10 +6,13 @@ import com.terraco.terracoDaCida.model.entity.Login;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface LoginService {
 
     Login autenticar(String NoUsuario, String coSenha) throws NoSuchAlgorithmException;
+
+    Login retornaUsuarioAutenticado(UUID uuid);
 
     LoginDTOView criarLogin(Login login);
 

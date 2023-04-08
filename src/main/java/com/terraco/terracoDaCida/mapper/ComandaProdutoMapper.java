@@ -15,6 +15,8 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
+import java.math.BigDecimal;
+
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ComandaProdutoQualifier.class)
 
 public interface ComandaProdutoMapper {
@@ -52,13 +54,10 @@ public interface ComandaProdutoMapper {
         return ComandaProdutoQualifier.getFirstInstance()
                 .noProdutoEntityToDTO(produto);
     }
-
-
     @Mapping(source = "comanda", target = "idComanda", qualifiedByName = "comandaEntityToDTO")
     @Mapping(source = "comanda", target = "noCliente", qualifiedByName = "noClienteEntityToDTO")
     @Mapping(source = "produto", target = "idProduto", qualifiedByName = "produtoEntityToDTO")
     @Mapping(source = "produto", target = "noProduto", qualifiedByName = "noProdutoEntityToDTO")
-    @Mapping(source = "vrComandaProduto", target = "vrProduto")
     @Mapping(source = "dataCriacao", target = "dtLancamento")
     ComandaProdutoDTOView toDto(ComandaProduto comandaProduto);
 
@@ -69,12 +68,12 @@ public interface ComandaProdutoMapper {
 
     @Mapping(source = "idComanda", target = "comanda", qualifiedByName = "comandaDtoToEntity")
     @Mapping(source = "idProduto", target = "produto", qualifiedByName = "produtoDtoToEntity")
-    @Mapping(source = "vrProduto", target = "vrComandaProduto")
     ComandaProduto viewToEntity(ComandaProdutoDTOView dto);
 
     @AfterMapping
     default void incluiVrComandaProduto(ComandaProdutoDTO dto, @MappingTarget ComandaProduto comandaProduto){
-        comandaProduto.setVrComandaProduto(comandaProduto.getProduto().getVrProduto());
+        comandaProduto.setVrUnitario(comandaProduto.getProduto().getVrProduto());
+        comandaProduto.setVrTotal(comandaProduto.getProduto().getVrProduto().multiply(new BigDecimal(comandaProduto.getQuantidade())));
     }
 
 }

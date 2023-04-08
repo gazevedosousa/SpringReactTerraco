@@ -44,6 +44,12 @@ public interface ComandaMapper {
                 .entityToDTOValorComanda(idComanda);
     }
 
+    @Named("dtoViewToEntity")
+    default Cliente dtoViewToEntity(String noCliente) {
+        return ComandaQualifier.getFirstInstance()
+                .dtoViewToEntity(noCliente);
+    }
+
     @Mapping(source = "cliente", target = "noCliente", qualifiedByName = "entityToDTO")
     @Mapping(source = "id" , target = "vrComanda", qualifiedByName = "entityToDTOValorComanda")
     @Mapping(source = "dataCriacao", target = "dtComanda")
@@ -52,5 +58,7 @@ public interface ComandaMapper {
     @Mapping(source = "idCliente", target = "cliente", qualifiedByName = "dtoToEntity")
     Comanda toEntity(ComandaDTO dto);
 
+    @Mapping(source = "noCliente", target = "cliente", qualifiedByName = "dtoViewToEntity")
+    Comanda toEntityFromDtoView(ComandaDTOView dto);
 
 }

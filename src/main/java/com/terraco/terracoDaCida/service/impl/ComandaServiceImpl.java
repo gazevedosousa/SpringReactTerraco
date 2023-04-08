@@ -69,10 +69,8 @@ public class ComandaServiceImpl implements ComandaService {
     @Transactional
     public ComandaDTOView deletar(Comanda comanda) throws ElementoNaoEncontradoException {
         validaDelecaoComanda(comanda);
-        Comanda comandaDeletada = repository.findByIdAndDataExclusaoIsNull(comanda.getId())
-                .orElseThrow(() -> new ElementoNaoEncontradoException("Comanda não encontrada no Banco de Dados"));
-        comandaDeletada.setDataExclusao(LocalDateTime.now());
-        comandaDeletada.setDataAtualizacao(LocalDateTime.now());
+        comanda.setDataExclusao(LocalDateTime.now());
+        comanda.setDataAtualizacao(LocalDateTime.now());
 
         List<PagamentoDTOView> pagamentoDTOViewList = pagamentoService.buscarPagamentosDeUmaComanda(comanda.getId());
 
@@ -90,7 +88,7 @@ public class ComandaServiceImpl implements ComandaService {
             });
         }
 
-        return mapper.toDto(repository.save(comandaDeletada));
+        return mapper.toDto(repository.save(comanda));
     }
 
     @Override

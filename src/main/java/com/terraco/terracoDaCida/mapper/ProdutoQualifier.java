@@ -31,5 +31,8 @@ public class ProdutoQualifier {
     public String entityToDTO(TipoProduto tipoProduto){
         return tipoProduto.getNoTipoProduto();
     }
+    public Long entityToDTOIdTipoProduto(TipoProduto tipoProduto){
+        return tipoProduto.getId();
+    }
 
 }

@@ -29,8 +29,14 @@ public class ComandaProduto {
     @JoinColumn(nullable = false)
     private Produto produto;
 
+    @Column(nullable = false)
+    private Long quantidade;
+
     @Column
-    private BigDecimal vrComandaProduto;
+    private BigDecimal vrUnitario;
+
+    @Column
+    private BigDecimal vrTotal;
 
     @Column(nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)

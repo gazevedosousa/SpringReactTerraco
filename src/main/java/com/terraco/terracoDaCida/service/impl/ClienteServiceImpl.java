@@ -77,6 +77,12 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
+    public Cliente buscarClientePorNome(String noCliente) {
+        return repository.findByNameAndDataExclusaoIsNull(noCliente)
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Cliente não encontrado no Banco de Dados"));
+    }
+
+    @Override
     public List<ClienteDTOView> buscarTodosOsClientesNaoExcluidos() {
         List<Cliente> clientes = repository.findAllWhereDataExclusaoIsNull();
         List<ClienteDTOView> clienteDTOS = new ArrayList<>();
@@ -114,7 +120,7 @@ public class ClienteServiceImpl implements ClienteService {
         List<ComandaDTOView> comandasDoCliente = comandaService.buscarComandasAbertasPorCliente(idCliente);
 
         if(!comandasDoCliente.isEmpty()){
-            throw new RegraNegocioException("Erro ao excluir. Cliente possui comanda aberta ou pendente");
+            throw new RegraNegocioException("Erro ao excluir. Cliente possui comanda aberta");
         }
     }
 }

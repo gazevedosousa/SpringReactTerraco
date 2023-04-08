@@ -5,8 +5,11 @@ import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.exceptions.RegraNegocioException;
 import com.terraco.terracoDaCida.mapper.ProdutoMapper;
 import com.terraco.terracoDaCida.model.entity.Produto;
+import com.terraco.terracoDaCida.model.entity.TipoProduto;
 import com.terraco.terracoDaCida.model.repository.ProdutoRepository;
+import com.terraco.terracoDaCida.model.repository.TipoProdutoRepository;
 import com.terraco.terracoDaCida.service.ProdutoService;
+import com.terraco.terracoDaCida.service.TipoProdutoService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import java.util.List;
 public class ProdutoServiceImpl implements ProdutoService {
 
     private final ProdutoRepository repository;
+    private final TipoProdutoRepository tipoProdutoRepository;
 
     private final ProdutoMapper mapper = ProdutoMapper.INSTANCE;
 
@@ -35,10 +39,13 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     @Override
     @Transactional
-    public ProdutoDTOView atualizar(Produto produto, BigDecimal novoVrProduto) {
+    public ProdutoDTOView atualizar(Produto produto, BigDecimal novoVrProduto, Long idTipoProduto) {
         Produto produtoAtualizado = repository.findByIdAndDataExclusaoIsNull(produto.getId())
                 .orElseThrow(() -> new ElementoNaoEncontradoException("Produto não encontrado no Banco de Dados"));
         produtoAtualizado.setVrProduto(novoVrProduto);
+        TipoProduto tipoProduto = tipoProdutoRepository.findByIdAndDataExclusaoIsNull(idTipoProduto)
+                .orElseThrow(() -> new ElementoNaoEncontradoException("Tipo de produto não encontrado no Banco de Dados"));
+        produtoAtualizado.setTipoProduto(tipoProduto);
         produtoAtualizado.setDataAtualizacao(LocalDateTime.now());
         return mapper.toDto(repository.save(produtoAtualizado));
     }

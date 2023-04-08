@@ -12,6 +12,7 @@ public interface ClienteService {
     ClienteDTOView deletar(Cliente cliente);
     Cliente buscarClienteNaoExcluido(Long id);
     Cliente buscarCliente(Long id);
+    Cliente buscarClientePorNome(String noCliente);
     List<ClienteDTOView> buscarTodosOsClientesNaoExcluidos();
     List<ClienteDTOView> buscarTodosOsClientes();
     void validarCliente(String noCliente);

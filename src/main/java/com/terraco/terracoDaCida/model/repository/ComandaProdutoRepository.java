@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ComandaProdutoRepository extends JpaRepository<ComandaProduto, Long> {
-    @Query("Select cp from ComandaProduto cp join cp.comanda c where c.id = :idComanda and cp.dataExclusao is null")
+    @Query("Select cp from ComandaProduto cp join cp.comanda c where c.id = :idComanda and cp.dataExclusao is null order by cp.dataCriacao asc")
     List<ComandaProduto> findByComandaIdAndDataExclusaoIsNull(Long idComanda);
     Optional<ComandaProduto> findByIdAndDataExclusaoIsNull(Long id);
 }

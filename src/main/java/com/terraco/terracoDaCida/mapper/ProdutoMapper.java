@@ -26,8 +26,14 @@ public interface ProdutoMapper {
         return ProdutoQualifier.getFirstInstance()
                 .entityToDTO(tipoProduto);
     }
+    @Named("entityToDTOIdTipoProduto")
+    default Long entityToDTOIdTipoProduto(TipoProduto tipoProduto){
+        return ProdutoQualifier.getFirstInstance()
+                .entityToDTOIdTipoProduto(tipoProduto);
+    }
 
-    @Mapping(source = "tipoProduto", target = "tipoProduto", qualifiedByName = "entityToDTO")
+    @Mapping(target = "tipoProduto", qualifiedByName = "entityToDTO")
+    @Mapping(source = "tipoProduto", target = "idTipoProduto", qualifiedByName = "entityToDTOIdTipoProduto")
     ProdutoDTOView toDto(Produto produto);
 
     @Mapping(source = "idTipoProduto", target = "tipoProduto", qualifiedByName = "dtoToEntity")

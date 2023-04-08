@@ -70,8 +70,10 @@ public class ComandaController {
     @DeleteMapping(value = "/{id}/deletar")
     public ResponseEntity deletar(@PathVariable("id") Long id)
     {
-        Comanda comanda = service.buscarComanda(id);
+        ComandaDTOView dto = mapper.toDto(service.buscarComanda(id));
+        Comanda comanda = mapper.toEntityFromDtoView(dto);
         ComandaDTOView comandaDeletada = service.deletar(comanda);
+
         return new ResponseEntity(comandaDeletada, HttpStatus.OK);
     }
 }
