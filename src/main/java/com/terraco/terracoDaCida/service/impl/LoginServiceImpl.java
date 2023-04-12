@@ -38,6 +38,7 @@ public class LoginServiceImpl implements LoginService {
 
         if(!Arrays.equals(login.get().getCoSenha(), CriptografiaUtil.criptografar(coSenha))){
             throw new RegraNegocioException("Senha inválida");
+
         }
 
         return login.get();

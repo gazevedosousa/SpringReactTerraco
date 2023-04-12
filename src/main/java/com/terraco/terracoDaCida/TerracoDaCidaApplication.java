@@ -18,7 +18,6 @@ public class TerracoDaCidaApplication implements WebMvcConfigurer {
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").allowedHeaders("*");
 	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(TerracoDaCidaApplication.class, args);
 	}

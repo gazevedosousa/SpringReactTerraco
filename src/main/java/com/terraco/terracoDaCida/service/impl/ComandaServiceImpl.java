@@ -72,22 +72,6 @@ public class ComandaServiceImpl implements ComandaService {
         comanda.setDataExclusao(LocalDateTime.now());
         comanda.setDataAtualizacao(LocalDateTime.now());
 
-        List<PagamentoDTOView> pagamentoDTOViewList = pagamentoService.buscarPagamentosDeUmaComanda(comanda.getId());
-
-        if(!pagamentoDTOViewList.isEmpty()){
-            pagamentoDTOViewList.forEach(pagamento -> {
-                pagamentoService.estornarPagamento(pagamentoMapper.viewToEntity(pagamento));
-            });
-        }
-
-        List<ComandaProdutoDTOView> comandaProdutoDTOViewList = comandaProdutoService.buscarProdutosDeUmaComanda(comanda.getId());
-
-        if(!comandaProdutoDTOViewList.isEmpty()){
-            comandaProdutoDTOViewList.forEach(comandaProduto -> {
-                comandaProdutoService.deletar(comandaProdutoMapper.viewToEntity(comandaProduto));
-            });
-        }
-
         return mapper.toDto(repository.save(comanda));
     }
 
@@ -140,6 +124,14 @@ public class ComandaServiceImpl implements ComandaService {
     public void validaDelecaoComanda(Comanda comanda) {
         if(comanda.getSituacaoComanda() == SituacaoComandaEnum.PAGA){
             throw new RegraNegocioException("Erro ao Deletar Comanda. Comanda já paga");
+        }
+        List<PagamentoDTOView> pagamentoDTOViewList = pagamentoService.buscarPagamentosDeUmaComanda(comanda.getId());
+        if(!pagamentoDTOViewList.isEmpty()){
+            throw new RegraNegocioException("Erro ao Deletar Comanda. Existe Pagamento cadastrado para a Comanda");
+        }
+        List<ComandaProdutoDTOView> comandaProdutoDTOViewList = comandaProdutoService.buscarProdutosDeUmaComanda(comanda.getId());
+        if(!comandaProdutoDTOViewList.isEmpty()){
+            throw new RegraNegocioException("Erro ao Deletar Comanda. Existe Produto cadastrado para a Comanda");
         }
     }
 }

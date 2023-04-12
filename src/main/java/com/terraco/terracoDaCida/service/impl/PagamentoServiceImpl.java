@@ -15,7 +15,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +65,42 @@ public class PagamentoServiceImpl implements PagamentoService {
     @Override
     public List<PagamentoDTOView> buscarPagamentosDeUmaComanda(Long idComanda) {
         List<Pagamento> pagamentoList = repository.findByComandaIdAndDataExclusaoIsNull(idComanda);
+        List<PagamentoDTOView> pagamentoDTOViews = new ArrayList<>();
+        pagamentoList.forEach(pagamento -> {
+            pagamentoDTOViews.add(mapper.toDto(pagamento));
+        });
+
+        return pagamentoDTOViews;
+    }
+
+    @Override
+    public List<PagamentoDTOView> buscarPagamentosEmUmaData(String data) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<Pagamento> pagamentoList = repository.findByDataCriacaoAndDataExclusaoIsNull(LocalDate.parse(data, formatter));
+        List<PagamentoDTOView> pagamentoDTOViews = new ArrayList<>();
+        pagamentoList.forEach(pagamento -> {
+            pagamentoDTOViews.add(mapper.toDto(pagamento));
+        });
+
+        return pagamentoDTOViews;
+    }
+
+    @Override
+    public List<PagamentoDTOView> buscarPagamentosEmUmMes(String data) {
+        String ano = data.substring(0,4);
+        String mes = data.substring(data.length() - 2);
+        List<Pagamento> pagamentoList = repository.findByMesCriacaoAndDataExclusaoIsNull(mes,ano);
+        List<PagamentoDTOView> pagamentoDTOViews = new ArrayList<>();
+        pagamentoList.forEach(pagamento -> {
+            pagamentoDTOViews.add(mapper.toDto(pagamento));
+        });
+
+        return pagamentoDTOViews;
+    }
+
+    @Override
+    public List<PagamentoDTOView> buscarPagamentosDeUmCliente(Long idCliente) {
+        List<Pagamento> pagamentoList = repository.findByIdClienteAndDataExclusaoIsNull(idCliente);
         List<PagamentoDTOView> pagamentoDTOViews = new ArrayList<>();
         pagamentoList.forEach(pagamento -> {
             pagamentoDTOViews.add(mapper.toDto(pagamento));

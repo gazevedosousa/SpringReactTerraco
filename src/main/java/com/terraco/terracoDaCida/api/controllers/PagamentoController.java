@@ -52,6 +52,38 @@ public class PagamentoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping(value = "/porData/{data}")
+    public ResponseEntity buscarPagamentoPorData(@PathVariable("data") String data)
+    {
+        try{
+            List<PagamentoDTOView> dto = service.buscarPagamentosEmUmaData(data);
+            return new ResponseEntity(dto, HttpStatus.OK);
+        }catch (ElementoNaoEncontradoException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/porMes/{data}")
+    public ResponseEntity buscarPagamentoPorMes(@PathVariable("data") String data)
+    {
+        try{
+            List<PagamentoDTOView> dto = service.buscarPagamentosEmUmMes(data);
+            return new ResponseEntity(dto, HttpStatus.OK);
+        }catch (ElementoNaoEncontradoException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/porCliente/{id}")
+    public ResponseEntity buscarPagamentoPorMes(@PathVariable("id") Long id)
+    {
+        try{
+            List<PagamentoDTOView> dto = service.buscarPagamentosDeUmCliente(id);
+            return new ResponseEntity(dto, HttpStatus.OK);
+        }catch (ElementoNaoEncontradoException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @GetMapping(value = "/comanda/{idComanda}")
     public ResponseEntity buscarPagamentoDeUmaComanda(@PathVariable("idComanda") Long id)

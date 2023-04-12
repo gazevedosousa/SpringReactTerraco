@@ -14,5 +14,8 @@ public interface PagamentoService {
     PagamentoDTOView estornarPagamento(Pagamento pagamento);
     Pagamento buscarPagamento(Long id);
     List<PagamentoDTOView> buscarPagamentosDeUmaComanda(Long idComanda);
+    List<PagamentoDTOView> buscarPagamentosEmUmaData(String data);
+    List<PagamentoDTOView> buscarPagamentosEmUmMes(String data);
+    List<PagamentoDTOView> buscarPagamentosDeUmCliente(Long idCliente);
     void validarPagamento(Comanda comanda);
 }

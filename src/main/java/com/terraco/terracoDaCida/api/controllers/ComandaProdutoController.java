@@ -3,6 +3,8 @@ package com.terraco.terracoDaCida.api.controllers;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTO;
 import com.terraco.terracoDaCida.api.dto.ComandaProdutoDTOView;
+import com.terraco.terracoDaCida.api.dto.PagamentoDTOView;
+import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.mapper.ComandaProdutoMapper;
 import com.terraco.terracoDaCida.model.entity.ComandaProduto;
 import com.terraco.terracoDaCida.service.ComandaProdutoService;
@@ -56,6 +58,28 @@ public class ComandaProdutoController {
         ComandaProduto comandaProduto = service.buscarComandaProduto(id);
         ComandaProdutoDTOView comandaProdutoDeletada = service.deletar(comandaProduto);
         return new ResponseEntity(comandaProdutoDeletada, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/porData/{data}")
+    public ResponseEntity buscarProdutoPorData(@PathVariable("data") String data)
+    {
+        try{
+            List<ComandaProdutoDTOView> dto = service.buscarProdutosEmUmaData(data);
+            return new ResponseEntity(dto, HttpStatus.OK);
+        }catch (ElementoNaoEncontradoException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/porMes/{data}")
+    public ResponseEntity buscarProdutoPorMes(@PathVariable("data") String data)
+    {
+        try{
+            List<ComandaProdutoDTOView> dto = service.buscarProdutosEmUmMes(data);
+            return new ResponseEntity(dto, HttpStatus.OK);
+        }catch (ElementoNaoEncontradoException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

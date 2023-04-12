@@ -1,7 +1,6 @@
 package com.terraco.terracoDaCida.model.repository;
 
 import com.terraco.terracoDaCida.model.entity.Cliente;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
