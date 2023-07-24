@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/login", produces="application/json")
+@RequestMapping(value = "/api/login/", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class LoginController {
@@ -33,21 +33,21 @@ public class LoginController {
     private final AuthenticationService authenticationService;
     private final LoginMapper mapper = LoginMapper.INSTANCE;
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}/")
     public ResponseEntity buscarLogin(@PathVariable("id") Long id)
     {
         LoginDTOView dto = mapper.toDto(service.buscarLogin(id));
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/todos")
+    @GetMapping(value = "/todos/")
     public ResponseEntity buscarTodosOsLogins()
     {
         List<LoginDTOView> loginDTOViews = service.buscarTodosOsLogins();
         return new ResponseEntity(loginDTOViews, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}/atualizar")
+    @PutMapping(value = "/{id}/atualizar/")
     public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody LoginDTO dto) throws NoSuchAlgorithmException
     {
         Login login = service.buscarLogin(id);
@@ -55,7 +55,7 @@ public class LoginController {
         return new ResponseEntity(loginAtualizado, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}/deletar")
+    @DeleteMapping(value = "/{id}/deletar/")
     public ResponseEntity deletar(@PathVariable("id") Long id)
     {
         Login login = service.buscarLogin(id);

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/cliente", produces="application/json")
+@RequestMapping(value = "/api/cliente/", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class ClienteController {
@@ -29,7 +29,7 @@ public class ClienteController {
     private final ClienteService service;
     private final ClienteMapper mapper = ClienteMapper.INSTANCE;
 
-    @PostMapping(value = "/criar")
+    @PostMapping(value = "/criar/")
     public ResponseEntity criar(@RequestBody ClienteDTO dto){
 
         Cliente cliente = mapper.toEntity(dto);
@@ -38,28 +38,28 @@ public class ClienteController {
 
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}/")
     public ResponseEntity buscarCliente(@PathVariable("id") Long id)
     {
         ClienteDTOView dto = mapper.toDto(service.buscarClienteNaoExcluido(id));
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/todos")
+    @GetMapping(value = "/todos/")
     public ResponseEntity buscarTodosOsClientes(){
 
         List<ClienteDTOView> clientes = service.buscarTodosOsClientesNaoExcluidos();
         return new ResponseEntity(clientes, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}/atualizar")
+    @PutMapping(value = "/{id}/atualizar/")
     public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody ClienteDTO dto){
         Cliente cliente = service.buscarClienteNaoExcluido(id);
         ClienteDTOView clienteAtualizado = service.atualizar(cliente, dto.getCelCliente(), dto.getEmailCliente());
         return new ResponseEntity(clienteAtualizado, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}/deletar")
+    @DeleteMapping(value = "/{id}/deletar/")
     public ResponseEntity deletar(@PathVariable("id") Long id){
 
         Cliente cliente = service.buscarClienteNaoExcluido(id);

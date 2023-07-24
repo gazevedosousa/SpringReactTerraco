@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/produto", produces="application/json")
+@RequestMapping(value = "/api/produto/", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class ProdutoController {
@@ -37,21 +37,21 @@ public class ProdutoController {
         return new ResponseEntity(produtoCriado, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}/")
     public ResponseEntity buscarProduto(@PathVariable("id") Long id)
     {
         ProdutoDTOView dto = mapper.toDto(service.buscarProdutoNaoExcluido(id));
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/todos")
+    @GetMapping(value = "/todos/")
     public ResponseEntity buscarTodosOsProdutos()
     {
         List<ProdutoDTOView> produtos = service.buscarTodosOsProdutosNaoExcluidos();
         return new ResponseEntity(produtos, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}/atualizar")
+    @PutMapping(value = "/{id}/atualizar/")
     public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody ProdutoDTO dto)
     {
         Produto produto = service.buscarProdutoNaoExcluido(id);
@@ -59,7 +59,7 @@ public class ProdutoController {
         return new ResponseEntity(produtoAtualizado, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}/deletar")
+    @DeleteMapping(value = "/{id}/deletar/")
     public ResponseEntity deletar(@PathVariable("id") Long id){
 
         Produto produto = service.buscarProdutoNaoExcluido(id);

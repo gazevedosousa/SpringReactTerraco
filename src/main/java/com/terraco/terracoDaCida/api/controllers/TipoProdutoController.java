@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/tipoProduto", produces="application/json")
+@RequestMapping(value = "/api/tipoProduto/", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class TipoProdutoController {
@@ -28,7 +28,7 @@ public class TipoProdutoController {
     private final TipoProdutoService service;
     private final TipoProdutoMapper mapper = TipoProdutoMapper.INSTANCE;
 
-    @PostMapping(value = "/criar")
+    @PostMapping(value = "/criar/")
     public ResponseEntity criar(@RequestBody TipoProdutoDTO dto)
     {
         TipoProduto tipoProduto = mapper.toEntity(dto);
@@ -36,21 +36,21 @@ public class TipoProdutoController {
         return new ResponseEntity(tipoProdutoCriado, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}/")
     public ResponseEntity buscarTipoProduto(@PathVariable("id") Long id)
     {
         TipoProdutoDTOView dto = mapper.toDto(service.buscarTipoProdutoNaoExcluido(id));
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/todos")
+    @GetMapping(value = "/todos/")
     public ResponseEntity buscarTodosOsTiposDeProduto()
     {
         List<TipoProdutoDTOView> tiposDeProduto = service.buscarTodosOsTiposProdutoNaoExcluidos();
         return new ResponseEntity(tiposDeProduto, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}/deletar")
+    @DeleteMapping(value = "/{id}/deletar/")
     public ResponseEntity deletar(@PathVariable("id") Long id)
     {
         TipoProduto tipoProduto = service.buscarTipoProdutoNaoExcluido(id);
