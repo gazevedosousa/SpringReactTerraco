@@ -52,7 +52,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = userRepository.findByNoUsuarioAndDataExclusaoIsNull(request.getNoUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário ou Senha inválidos"));
         var jwt = jwtService.generateToken(user);
-        return JwtAuthDTO.builder().token(jwt).build();
+        var login = loginMapper.toDto(user);
+        return JwtAuthDTO.builder().token(jwt).login(login).build();
     }
 }
 
