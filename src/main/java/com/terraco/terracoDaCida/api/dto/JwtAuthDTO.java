@@ -2,18 +2,13 @@ package com.terraco.terracoDaCida.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.util.UUID;
-
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AutenticacaoDTO {
-
-    private UUID token;
+public class JwtAuthDTO {
+    private String token;
 }

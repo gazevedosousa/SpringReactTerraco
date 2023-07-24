@@ -8,9 +8,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +23,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Login {
+public class Login implements UserDetails {
     @Id
     @Column
     @GeneratedValue( strategy = GenerationType.IDENTITY)
@@ -29,13 +33,10 @@ public class Login {
     private String noUsuario;
 
     @Column(nullable = false)
-    private byte[] coSenha;
+    private String coSenha;
 
     @Column(nullable = false)
     private PerfilEnum perfil;
-
-    @Column(nullable = false)
-    private UUID token;
 
     @Column(nullable = true)
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
@@ -50,4 +51,36 @@ public class Login {
     private LocalDateTime dataExclusao;
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public String getPassword() {
+        return coSenha;
+    }
+
+    @Override
+    public String getUsername() { return noUsuario; }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

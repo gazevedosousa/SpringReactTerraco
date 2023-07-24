@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/lancamentos")
+@RequestMapping(value = "/api/lancamentos", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class ComandaProdutoController {

@@ -10,9 +10,7 @@ import java.util.UUID;
 
 public interface LoginService {
 
-    Login autenticar(String NoUsuario, String coSenha) throws NoSuchAlgorithmException;
-
-    Login retornaUsuarioAutenticado(UUID uuid);
+    Login autenticar(String NoUsuario, String coSenha);
 
     LoginDTOView criarLogin(Login login);
 

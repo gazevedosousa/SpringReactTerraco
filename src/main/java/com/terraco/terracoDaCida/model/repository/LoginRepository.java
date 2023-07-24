@@ -15,6 +15,4 @@ public interface LoginRepository extends JpaRepository<Login, Long> {
     boolean existsByNoUsuarioAndDataExclusaoIsNull(String NoUsuario);
     Optional<Login> findByNoUsuarioAndDataExclusaoIsNull(String NoUsuario);
     Optional<Login> findByIdAndDataExclusaoIsNull(Long id);
-    @Query("Select l from Login l where l.token = :uuid and l.dataExclusao is null")
-    Optional<Login> findByToken(UUID uuid);
 }

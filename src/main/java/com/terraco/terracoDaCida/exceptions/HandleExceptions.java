@@ -20,4 +20,10 @@ public class HandleExceptions extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(NaoAutorizadoException.class)
+    public ResponseEntity<?> handleException(NaoAutorizadoException e, WebRequest request){
+
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }

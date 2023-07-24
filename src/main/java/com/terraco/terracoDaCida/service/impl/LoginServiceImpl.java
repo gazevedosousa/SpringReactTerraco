@@ -1,6 +1,5 @@
 package com.terraco.terracoDaCida.service.impl;
 
-import com.terraco.terracoDaCida.Util.CriptografiaUtil;
 import com.terraco.terracoDaCida.api.dto.LoginDTOView;
 import com.terraco.terracoDaCida.exceptions.ElementoNaoEncontradoException;
 import com.terraco.terracoDaCida.exceptions.RegraNegocioException;
@@ -10,45 +9,38 @@ import com.terraco.terracoDaCida.model.repository.LoginRepository;
 import com.terraco.terracoDaCida.service.LoginService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class LoginServiceImpl implements LoginService {
 
     private final LoginRepository repository;
+    private final PasswordEncoder encoder;
 
     private final LoginMapper mapper = LoginMapper.INSTANCE;
 
     @Override
-    public Login autenticar(String noUsuario, String coSenha) throws NoSuchAlgorithmException {
+    public Login autenticar(String noUsuario, String coSenha) {
         Optional<Login> login = repository.findByNoUsuarioAndDataExclusaoIsNull(noUsuario);
 
         if(login.isEmpty()){
             throw new ElementoNaoEncontradoException("Usuário não encontrado no Banco de Dados");
         }
 
-        if(!Arrays.equals(login.get().getCoSenha(), CriptografiaUtil.criptografar(coSenha))){
+        if(!encoder.matches(coSenha, login.get().getCoSenha())){
             throw new RegraNegocioException("Senha inválida");
-
         }
 
         return login.get();
     }
 
-    @Override
-    public Login retornaUsuarioAutenticado(UUID uuid) {
-        return repository.findByToken(uuid)
-                .orElseThrow(() -> new ElementoNaoEncontradoException("Token não encontrado no Banco de Dados"));
-    }
 
     @Override
     @Transactional
@@ -56,15 +48,16 @@ public class LoginServiceImpl implements LoginService {
         validarLogin(login.getNoUsuario());
         login.setDataCriacao(LocalDateTime.now());
         login.setDataAtualizacao(LocalDateTime.now());
+        login.setCoSenha(encoder.encode(login.getCoSenha()));
         return mapper.toDto(repository.save(login));
     }
     @Override
     @Transactional
-    public LoginDTOView alterarSenha(Login login, String coSenhaNova) throws NoSuchAlgorithmException {
+    public LoginDTOView alterarSenha(Login login, String coSenhaNova) {
         Login loginAtualizado = repository.findByNoUsuarioAndDataExclusaoIsNull(login.getNoUsuario())
                 .orElseThrow(() -> new ElementoNaoEncontradoException("Usuário não encontrado no Banco de Dados"));
 
-        loginAtualizado.setCoSenha(CriptografiaUtil.criptografar(coSenhaNova));
+        loginAtualizado.setCoSenha(encoder.encode(coSenhaNova));
         loginAtualizado.setDataAtualizacao(LocalDateTime.now());
         return mapper.toDto(repository.save(loginAtualizado));
     }

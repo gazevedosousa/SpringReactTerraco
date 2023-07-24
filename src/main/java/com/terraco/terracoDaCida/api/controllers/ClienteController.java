@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/cliente")
+@RequestMapping(value = "/api/cliente", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class ClienteController {
