@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/lancamentos/", produces="application/json")
+@RequestMapping(value = "/api/lancamentos", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class ComandaProdutoController {
@@ -30,7 +30,7 @@ public class ComandaProdutoController {
     private final ComandaProdutoService service;
     private final ComandaProdutoMapper mapper = ComandaProdutoMapper.INSTANCE;
 
-    @PostMapping(value = "/criar/")
+    @PostMapping(value = "/criar")
     public ResponseEntity criar(@RequestBody ComandaProdutoDTO dto)
     {
         ComandaProduto comandaProduto = mapper.toEntity(dto);
@@ -38,21 +38,21 @@ public class ComandaProdutoController {
         return new ResponseEntity(comandaProdutoCriada, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/{id}/")
+    @GetMapping(value = "/{id}")
     public ResponseEntity buscarComandaProduto(@PathVariable("id") Long id)
     {
         ComandaProdutoDTOView dto = mapper.toDto(service.buscarComandaProduto(id));
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/comanda/{idComanda}/")
+    @GetMapping(value = "/comanda/{idComanda}")
     public ResponseEntity buscarProdutosDeComanda(@PathVariable("idComanda") Long idComanda)
     {
         List<ComandaProdutoDTOView> comandas = service.buscarProdutosDeUmaComanda(idComanda);
         return new ResponseEntity(comandas, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}/deletar/")
+    @DeleteMapping(value = "/{id}/deletar")
     public ResponseEntity deletar(@PathVariable("id") Long id)
     {
         ComandaProduto comandaProduto = service.buscarComandaProduto(id);
@@ -60,7 +60,7 @@ public class ComandaProdutoController {
         return new ResponseEntity(comandaProdutoDeletada, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/porData/{data}/")
+    @GetMapping(value = "/porData/{data}")
     public ResponseEntity buscarProdutoPorData(@PathVariable("data") String data)
     {
         try{
@@ -71,7 +71,7 @@ public class ComandaProdutoController {
         }
     }
 
-    @GetMapping(value = "/porMes/{data}/")
+    @GetMapping(value = "/porMes/{data}")
     public ResponseEntity buscarProdutoPorMes(@PathVariable("data") String data)
     {
         try{

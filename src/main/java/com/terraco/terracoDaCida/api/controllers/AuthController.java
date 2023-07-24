@@ -12,20 +12,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/usuario/", produces="application/json")
+@RequestMapping(value = "/usuario", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationService service;
 
-    @PostMapping(value = "/autenticar/")
+    @PostMapping(value = "/autenticar")
     public ResponseEntity autenticar(@RequestBody LoginDTO dto) {
         JwtAuthDTO token = service.signin(dto);
         return new ResponseEntity(token, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/criar/")
+    @PostMapping(value = "/criar")
     public ResponseEntity criar(@RequestBody LoginDTO dto)
     {
         LoginDTOView login = service.signup(dto);

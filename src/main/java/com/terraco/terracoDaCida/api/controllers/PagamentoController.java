@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/pagamento/", produces="application/json")
+@RequestMapping(value = "/api/pagamento", produces="application/json")
 @JsonDeserialize
 @RequiredArgsConstructor
 public class PagamentoController {
@@ -29,7 +29,7 @@ public class PagamentoController {
     private final PagamentoService service;
     private final PagamentoMapper mapper = PagamentoMapper.INSTANCE;
 
-    @PostMapping(value = "/criar/")
+    @PostMapping(value = "/criar")
     public ResponseEntity criar(@RequestBody PagamentoDTO dto){
 
         Pagamento pagamento = mapper.toEntity(dto);
@@ -42,7 +42,7 @@ public class PagamentoController {
         }
     }
 
-    @GetMapping(value = "/{id}/")
+    @GetMapping(value = "/{id}")
     public ResponseEntity buscarPagamento(@PathVariable("id") Long id)
     {
         try{
@@ -52,7 +52,7 @@ public class PagamentoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    @GetMapping(value = "/porData/{data}/")
+    @GetMapping(value = "/porData/{data}")
     public ResponseEntity buscarPagamentoPorData(@PathVariable("data") String data)
     {
         try{
@@ -63,7 +63,7 @@ public class PagamentoController {
         }
     }
 
-    @GetMapping(value = "/porMes/{data}/")
+    @GetMapping(value = "/porMes/{data}")
     public ResponseEntity buscarPagamentoPorMes(@PathVariable("data") String data)
     {
         try{
@@ -74,7 +74,7 @@ public class PagamentoController {
         }
     }
 
-    @GetMapping(value = "/porCliente/{id}/")
+    @GetMapping(value = "/porCliente/{id}")
     public ResponseEntity buscarPagamentoPorMes(@PathVariable("id") Long id)
     {
         try{
@@ -85,7 +85,7 @@ public class PagamentoController {
         }
     }
 
-    @GetMapping(value = "/comanda/{idComanda}/")
+    @GetMapping(value = "/comanda/{idComanda}")
     public ResponseEntity buscarPagamentoDeUmaComanda(@PathVariable("idComanda") Long id)
     {
         try{
@@ -96,7 +96,7 @@ public class PagamentoController {
         }
     }
 
-    @DeleteMapping(value = "/{id}/deletar/")
+    @DeleteMapping(value = "/{id}/deletar")
     public ResponseEntity deletar(@PathVariable("id") Long id){
 
         Pagamento pagamento = service.buscarPagamento(id);
