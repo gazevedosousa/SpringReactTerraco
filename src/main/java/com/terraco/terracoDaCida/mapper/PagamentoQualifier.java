@@ -23,14 +23,12 @@ public class PagamentoQualifier {
     public static PagamentoQualifier getFirstInstance(){
         return FIRST_INSTANCE;
     }
-
     public Comanda dtoToEntity(Long idComanda){
         return comandaService.buscarComanda(idComanda);
     }
     public Long entityToDTO(Comanda comanda){
         return comanda.getId();
     }
-
     public String entityToDTOCliente(Comanda comanda){
         return String.valueOf(comanda.getCliente().getNoCliente());
     }
